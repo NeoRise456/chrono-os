@@ -14,15 +14,13 @@ const COLLAPSED_HEIGHT = 48
 
 export function ChronoDashboard() {
   const [sheetHeight, setSheetHeight] = useState(DEFAULT_SHEET_HEIGHT)
-  const [sheetExpanded, setSheetExpanded] = useState(false)
 
   const handleSheetHeightChange = useCallback((height: number, isCollapsed: boolean) => {
     setSheetHeight(isCollapsed ? COLLAPSED_HEIGHT : height)
   }, [])
 
-  const handleEditModeChange = useCallback((isEditing: boolean) => {
-    // Keep sheetExpanded in sync with edit mode so edit mode controls expansion state
-    setSheetExpanded(isEditing)
+  const handleEditModeChange = useCallback(() => {
+    // Sheet can be collapsed/expanded independently in both modes
   }, [])
 
   return (
@@ -31,7 +29,7 @@ export function ChronoDashboard() {
         <ChronoSidebar />
         <SidebarInset className="min-h-screen bg-background flex flex-col">
           <ChronoHeader />
-          {/* Main content area - relative container for the bottom sheet */}
+          {/* Main content area - relative container for bottom sheet */}
           <main className="flex-1 overflow-hidden relative">
             {/* Timetable - full width, adjusts to sheet height */}
             <div 
@@ -42,14 +40,13 @@ export function ChronoDashboard() {
                 <Timetable onEditModeChange={handleEditModeChange} />
               </div>
             </div>
-            
+             
             {/* Bottom sheet - positioned inside main area */}
             <BottomSheet
               defaultHeight={DEFAULT_SHEET_HEIGHT}
               minHeight={200}
               maxHeight={600}
               collapsedHeight={COLLAPSED_HEIGHT}
-              expanded={sheetExpanded}
               onHeightChange={handleSheetHeightChange}
             >
               <BottomPanel />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, type ReactNode, createContext, useContext } from "react"
+import { useState, useCallback, useRef, type ReactNode, createContext, useContext } from "react"
 import { ChevronUp, ChevronDown, GripHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -36,43 +36,26 @@ export function BottomSheet({
   expanded,
   onHeightChange,
 }: BottomSheetProps) {
-  const [height, setHeight] = useState(defaultHeight)
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [internalHeight, setInternalHeight] = useState(defaultHeight)
+  const [internalCollapsed, setInternalCollapsed] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
   const previousHeight = useRef(defaultHeight)
 
-  // Handle external expansion control
-  useEffect(() => {
-    if (expanded === undefined) return
-
-    if (expanded === true) {
-      // Force open to previously stored height (or default)
-      const target = previousHeight.current || defaultHeight
-      setIsCollapsed(false)
-      setHeight(target)
-      onHeightChange?.(target, false)
-    } else {
-      // If controller says collapse isn't requested, just sync parent with current state
-      onHeightChange?.(isCollapsed ? collapsedHeight : height, isCollapsed)
-    }
-  }, [expanded, defaultHeight, collapsedHeight, isCollapsed, height, onHeightChange])
-
-  const updateHeight = useCallback((newHeight: number, collapsed: boolean) => {
-    setHeight(newHeight)
-    setIsCollapsed(collapsed)
-    onHeightChange?.(collapsed ? collapsedHeight : newHeight, collapsed)
-  }, [collapsedHeight, onHeightChange])
+  const isCollapsed = expanded === undefined ? internalCollapsed : !expanded
+  const height = expanded === undefined ? internalHeight : (expanded ? previousHeight.current : internalHeight)
 
   const handleToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     if (isCollapsed) {
-      updateHeight(previousHeight.current, false)
+      setInternalCollapsed(false)
+      onHeightChange?.(previousHeight.current, false)
     } else {
       previousHeight.current = height
-      updateHeight(height, true)
+      setInternalCollapsed(true)
+      onHeightChange?.(height, true)
     }
-  }, [isCollapsed, height, updateHeight])
+  }, [isCollapsed, height, onHeightChange])
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
@@ -87,7 +70,7 @@ export function BottomSheet({
       const handleMouseMove = (moveEvent: MouseEvent) => {
         const deltaY = startY - moveEvent.clientY
         const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeight + deltaY))
-        setHeight(newHeight)
+        setInternalHeight(newHeight)
         onHeightChange?.(newHeight, false)
       }
 
@@ -115,12 +98,12 @@ export function BottomSheet({
       if (e.key === "ArrowUp") {
         e.preventDefault()
         const newHeight = Math.min(maxHeight, height + 20)
-        setHeight(newHeight)
+        setInternalHeight(newHeight)
         onHeightChange?.(newHeight, false)
       } else if (e.key === "ArrowDown") {
         e.preventDefault()
         const newHeight = Math.max(minHeight, height - 20)
-        setHeight(newHeight)
+        setInternalHeight(newHeight)
         onHeightChange?.(newHeight, false)
       }
     },

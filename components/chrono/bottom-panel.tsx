@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { Trash2, Pencil, Check, X, Palette, Plus } from "lucide-react"
+import { Trash2, Pencil, Check, X, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useChrono } from "./chrono-context"
 import { Button } from "@/components/ui/button"
@@ -568,7 +568,6 @@ function CardInfo() {
   )
 }
 
-// Main Bottom Panel
 export function BottomPanel() {
   return (
     <div className="flex h-full">

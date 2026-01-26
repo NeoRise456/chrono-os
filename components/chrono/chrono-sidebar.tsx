@@ -69,8 +69,8 @@ const helpItems = [
 export function ChronoSidebar() {
   const pathname = usePathname()
 
-  return (
-    <Sidebar collapsible="none" className="border-r border-border">
+return (
+    <Sidebar collapsible="offcanvas" className="border-r border-border">
       <SidebarHeader className="h-16 px-6 border-b border-border flex flex-row items-center">
         <span className="w-3 h-3 bg-foreground mr-3" aria-hidden="true" />
         <h1 className="text-lg font-bold tracking-widest font-display">

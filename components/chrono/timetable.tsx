@@ -20,7 +20,7 @@ const timeSlots = getTimeSlots()
 
 function TimeColumn() {
   return (
-    <div className="w-16 flex-shrink-0 border-r border-border">
+    <div className="w-16 shrink-0 border-r border-border">
       <div className="h-10 border-b border-border bg-muted/30" />
       {timeSlots.map((hour) => (
         <div
@@ -142,7 +142,7 @@ export function Timetable({ onEditModeChange }: TimetableProps) {
   return (
     <div className="flex-1 flex flex-col bg-card tech-border min-h-0 h-full overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-2 border-b border-border flex-shrink-0 flex items-center justify-between">
+      <div className="px-4 py-2 border-b border-border shrink-0 flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5 font-display">
             Chrono System

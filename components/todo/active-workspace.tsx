@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function ActiveWorkspace() {
+  const { viewMode, setViewMode } = useTodo();
   const { createTask } = useTodo();
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
@@ -31,102 +32,140 @@ export function ActiveWorkspace() {
   );
 
   return (
-    <div className="flex gap-4 h-full">
-      {/* Routine Column */}
-      <div className="flex-1 flex flex-col border-r border-border min-w-0">
-        <div className="px-6 py-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-bold uppercase tracking-widest font-display text-foreground">
-              The Routine
-            </h3>
-            <span className="text-xs text-muted-foreground font-display">
-              {routineTasks.length}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground font-display">
-            Recurring habits & tasks
+    <div className="flex flex-col h-full">
+      {/* Header with title and tab buttons */}
+      <div className="px-4 py-2 border-b border-border shrink-0 h-16 flex items-center justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5 font-display">
+            Task Manager
           </p>
+          <h3 className="text-base font-bold text-foreground font-display">
+            {viewMode === "active" ? "Active Workspace" : "Past Tasks"}
+          </h3>
         </div>
-
-        <ScrollArea className="flex-1">
-          <div className="p-3 space-y-1">
-            {routineTasks.length === 0 ? (
-              <div className="flex items-center justify-center h-32 text-xs text-muted-foreground font-display">
-                No recurring tasks yet
-              </div>
-            ) : (
-              routineTasks.map((task) => (
-                <TaskCard
-                  key={task._id}
-                  id={task._id}
-                  title={task.title}
-                  description={task.description}
-                  status={task.status as "active" | "completed" | "terminated"}
-                  recurrence={task.recurrence}
-                  dueDate={task.dueDate}
-                  tags={task.tags}
-                  priority={task.priority}
-                />
-              ))
-            )}
-          </div>
-        </ScrollArea>
+        
+        <div className="flex items-center gap-1 border border-border">
+          <button
+            onClick={() => setViewMode("active")}
+            className={`px-4 py-2 text-sm font-display uppercase tracking-wider transition-colors border-r border-border ${
+              viewMode === "active"
+                ? "bg-foreground text-background"
+                : "bg-background text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setViewMode("past")}
+            className={`px-4 py-2 text-sm font-display uppercase tracking-wider transition-colors ${
+              viewMode === "past"
+                ? "bg-foreground text-background"
+                : "bg-background text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Past
+          </button>
+        </div>
       </div>
 
-      {/* Inbox Column */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="px-6 py-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-bold uppercase tracking-widest font-display text-foreground">
-              The Inbox
-            </h3>
-            <span className="text-xs text-muted-foreground font-display">
-              {inboxTasks.length}
-            </span>
+      {/* Main content area with columns */}
+      <div className="flex-1 flex gap-4 overflow-hidden">
+        {/* Routine Column */}
+        <div className="flex-1 flex flex-col border-r border-border min-w-0">
+          <div className="px-6 py-4 border-b border-border flex-shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold uppercase tracking-widest font-display text-foreground">
+                The Routine
+              </h3>
+              <span className="text-xs text-muted-foreground font-display">
+                {routineTasks.length}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground font-display">
+              Recurring habits & tasks
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground font-display">
-            One-off tasks
-          </p>
+
+          <ScrollArea className="flex-1">
+            <div className="p-3 space-y-1">
+              {routineTasks.length === 0 ? (
+                <div className="flex items-center justify-center h-32 text-xs text-muted-foreground font-display">
+                  No recurring tasks yet
+                </div>
+              ) : (
+                routineTasks.map((task) => (
+                  <TaskCard
+                    key={task._id}
+                    id={task._id}
+                    title={task.title}
+                    description={task.description}
+                    status={task.status as "active" | "completed" | "terminated"}
+                    recurrence={task.recurrence}
+                    dueDate={task.dueDate}
+                    tags={task.tags}
+                    priority={task.priority}
+                  />
+                ))
+              )}
+            </div>
+          </ScrollArea>
         </div>
 
-        <div className="px-6 py-3 flex-shrink-0">
-          <form onSubmit={handleCreateTask} className="flex items-center gap-3 bg-zinc-900/30 p-3 border border-border hover:border-muted-foreground/50 transition-colors group">
-            <Plus className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-            <Input
-              type="text"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreateTask(e);
-              }}
-              placeholder="ADD_NEW_TASK [PRESS ENTER]"
-              className="bg-transparent border-none focus:ring-0 text-foreground placeholder-muted-foreground font-display h-auto text-sm w-full"
-            />
-          </form>
-        </div>
-
-        <ScrollArea className="flex-1">
-          <div className="p-3 space-y-1">
-            {inboxTasks.length === 0 ? (
-              <div className="flex items-center justify-center h-32 text-xs text-muted-foreground font-display">
-                Inbox is empty
-              </div>
-            ) : (
-              inboxTasks.map((task) => (
-                <TaskCard
-                  key={task._id}
-                  id={task._id}
-                  title={task.title}
-                  description={task.description}
-                  status={task.status as "active" | "completed" | "terminated"}
-                  dueDate={task.dueDate}
-                  tags={task.tags}
-                  priority={task.priority}
-                />
-              ))
-            )}
+        {/* Inbox Column */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="px-6 py-4 border-b border-border flex-shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold uppercase tracking-widest font-display text-foreground">
+                The Inbox
+              </h3>
+              <span className="text-xs text-muted-foreground font-display">
+                {inboxTasks.length}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground font-display">
+              One-off tasks
+            </p>
           </div>
-        </ScrollArea>
+
+          <div className="px-6 py-3 flex-shrink-0">
+            <form onSubmit={handleCreateTask} className="flex items-center gap-3 bg-zinc-900/30 p-3 border border-border hover:border-muted-foreground/50 transition-colors group">
+              <Plus className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Input
+                type="text"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateTask(e);
+                }}
+                placeholder="ADD_NEW_TASK [PRESS ENTER]"
+                className="bg-transparent border-none focus:ring-0 text-foreground placeholder-muted-foreground font-display h-auto text-sm w-full"
+              />
+            </form>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-3 space-y-1">
+              {inboxTasks.length === 0 ? (
+                <div className="flex items-center justify-center h-32 text-xs text-muted-foreground font-display">
+                  Inbox is empty
+                </div>
+              ) : (
+                inboxTasks.map((task) => (
+                  <TaskCard
+                    key={task._id}
+                    id={task._id}
+                    title={task.title}
+                    description={task.description}
+                    status={task.status as "active" | "completed" | "terminated"}
+                    dueDate={task.dueDate}
+                    tags={task.tags}
+                    priority={task.priority}
+                  />
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );

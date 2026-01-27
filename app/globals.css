@@ -173,6 +173,47 @@
   opacity: 0.3;
 }
 
+
+/* Tech full corner decorations */
+.tech-full-border {
+  @apply relative;
+}
+
+/* The Corners (painted on ::before) */
+.tech-full-border::before {
+  content: "";
+  /* Position it slightly outside the content box (-1px) */
+  @apply absolute -top-px -left-px -right-px -bottom-px pointer-events-none;
+  @apply pointer-events-none opacity-30;
+  
+  /* CONFIGURATION: Adjust these to change the look */
+  --corner-size: 10px;  /* How long the arms of the corner are */
+  --line-width: 2px;    /* Thickness of the lines */
+  --color: currentColor; /* Matches the text color */
+
+  /* We use 8 gradients (2 per corner) to draw the lines */
+  background:
+    /* TOP-LEFT CORNER */
+    linear-gradient(to right,  var(--color) var(--line-width), transparent var(--line-width)) top left,
+    linear-gradient(to bottom, var(--color) var(--line-width), transparent var(--line-width)) top left,
+    
+    /* TOP-RIGHT CORNER */
+    linear-gradient(to left,   var(--color) var(--line-width), transparent var(--line-width)) top right,
+    linear-gradient(to bottom, var(--color) var(--line-width), transparent var(--line-width)) top right,
+    
+    /* BOTTOM-RIGHT CORNER */
+    linear-gradient(to left,   var(--color) var(--line-width), transparent var(--line-width)) bottom right,
+    linear-gradient(to top,    var(--color) var(--line-width), transparent var(--line-width)) bottom right,
+
+    /* BOTTOM-LEFT CORNER */
+    linear-gradient(to right,  var(--color) var(--line-width), transparent var(--line-width)) bottom left,
+    linear-gradient(to top,    var(--color) var(--line-width), transparent var(--line-width)) bottom left;
+
+  /* Define the size of the "canvas" for each corner so they don't touch */
+  background-size: var(--corner-size) var(--corner-size);
+  background-repeat: no-repeat;
+}
+
 /* Font display utility */
 .font-display {
   font-family: var(--font-space-mono), var(--font-geist-mono), monospace;

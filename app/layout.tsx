@@ -21,7 +21,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HABIT_OS - Life Planner",
+  title: "CHRONO_OS",
   description: "Track and optimize your daily habits with precision",
 };
 

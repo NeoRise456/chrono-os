@@ -36,8 +36,10 @@ interface TodoContextType extends TodoState {
     priority?: string;
   }) => Promise<void>;
   completeTask: (taskId: Id<"tasks">) => Promise<void>;
+  uncompleteTask: (taskId: Id<"tasks">) => Promise<void>;
   terminateTask: (taskId: Id<"tasks">) => Promise<void>;
   deleteTask: (taskId: Id<"tasks">) => Promise<void>;
+  moveToPast: (taskId: Id<"tasks">) => Promise<void>;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -84,8 +86,10 @@ export function TodoProvider({ children }: TodoProviderProps) {
   const createTaskMutation = useMutation(api.tasks.createTask);
   const updateTaskMutation = useMutation(api.tasks.updateTask);
   const completeTaskMutation = useMutation(api.tasks.completeTask);
+  const uncompleteTaskMutation = useMutation(api.tasks.uncompleteTask);
   const terminateTaskMutation = useMutation(api.tasks.terminateTask);
   const deleteTaskMutation = useMutation(api.tasks.deleteTask);
+  const moveToPastMutation = useMutation(api.tasks.moveToPast);
 
   const createTask = useCallback(
     async (args: {
@@ -123,6 +127,13 @@ export function TodoProvider({ children }: TodoProviderProps) {
     [completeTaskMutation]
   );
 
+  const uncompleteTask = useCallback(
+    async (taskId: Id<"tasks">) => {
+      await uncompleteTaskMutation({ taskId });
+    },
+    [uncompleteTaskMutation]
+  );
+
   const terminateTask = useCallback(
     async (taskId: Id<"tasks">) => {
       await terminateTaskMutation({ taskId });
@@ -137,6 +148,13 @@ export function TodoProvider({ children }: TodoProviderProps) {
     [deleteTaskMutation]
   );
 
+  const moveToPast = useCallback(
+    async (taskId: Id<"tasks">) => {
+      await moveToPastMutation({ taskId });
+    },
+    [moveToPastMutation]
+  );
+
   return (
     <TodoContext.Provider
       value={{
@@ -148,8 +166,10 @@ export function TodoProvider({ children }: TodoProviderProps) {
         createTask,
         updateTask,
         completeTask,
+        uncompleteTask,
         terminateTask,
         deleteTask,
+        moveToPast,
       }}
     >
       {children}

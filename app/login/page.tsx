@@ -4,9 +4,15 @@ import Link from "next/link"
 import { Github, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
+import { router } from "better-auth/api"
+import { useRouter } from "next/navigation"
+import { authClient } from "@/lib/auth-client"
+
+
 
 function SyncTime() {
-  const [time, setTime] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>(null);
+  
 
   useEffect(() => {
     const updateTime = () => {
@@ -36,6 +42,18 @@ function SyncTime() {
 }
 
 export default function LoginPage() {
+
+  const router = useRouter();
+
+  async function handleGithubSignIn() {
+    const {error} = await authClient.signIn.social({
+      provider: "github",
+      callbackURL: "/schedule"
+    });
+
+
+  }
+
   return (
     <div className="flex min-h-screen flex-col font-display bg-background">
       <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
@@ -65,12 +83,12 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <Link href="/schedule" className="w-full">
-              <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" 
+              onClick={() => handleGithubSignIn()}
+              >
                 <Github className="mr-2 h-4 w-4" />
                 Github
-              </Button>
-            </Link>
+            </Button>
 
             <Link href="/schedule" className="w-full">
               <Button variant="outline" className="w-full justify-start">

@@ -87,6 +87,30 @@ export const completeTask = mutation({
   },
 });
 
+export const uncompleteTask = mutation({
+  args: { taskId: v.id("tasks") },
+  handler: async (ctx, args) => {
+    const userId = await ctx.auth.getUserIdentity();
+    if (!userId) throw new Error("Unauthorized");
+
+    const task = await ctx.db.get(args.taskId);
+    if (!task || task.userId !== userId.tokenIdentifier) {
+      throw new Error("Task not found or unauthorized");
+    }
+
+    // Only uncomplete non-recurring tasks
+    if (task.recurrence) {
+      throw new Error("Cannot uncomplete recurring tasks");
+    }
+
+    // Mark task as active and clear completedAt
+    await ctx.db.patch(args.taskId, {
+      status: "active",
+      completedAt: undefined,
+    });
+  },
+});
+
 export const terminateTask = mutation({
   args: { taskId: v.id("tasks") },
   handler: async (ctx, args) => {
@@ -121,6 +145,24 @@ export const deleteTask = mutation({
   },
 });
 
+export const moveToPast = mutation({
+  args: { taskId: v.id("tasks") },
+  handler: async (ctx, args) => {
+    const userId = await ctx.auth.getUserIdentity();
+    if (!userId) throw new Error("Unauthorized");
+
+    const task = await ctx.db.get(args.taskId);
+    if (!task || task.userId !== userId.tokenIdentifier) {
+      throw new Error("Task not found or unauthorized");
+    }
+
+    await ctx.db.patch(args.taskId, {
+      status: "completed",
+      completedAt: Date.now(),
+    });
+  },
+});
+
 export const getActiveTasks = query({
   args: {},
   handler: async (ctx) => {
@@ -146,15 +188,24 @@ export const getRoutineTasks = query({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayTimestamp = today.getTime();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowTimestamp = tomorrow.getTime();
 
     const tasks = await ctx.db
       .query("tasks")
-      .filter((q) => 
+      .filter((q) =>
         q.and(
           q.eq(q.field("userId"), userId.tokenIdentifier),
-          q.eq(q.field("status"), "active"),
           q.neq(q.field("recurrence"), null),
-          q.lte(q.field("dueDate"), todayTimestamp)
+          q.or(
+            q.eq(q.field("status"), "active"),
+            q.and(
+              q.eq(q.field("status"), "completed"),
+              q.gte(q.field("completedAt"), todayTimestamp),
+              q.lt(q.field("completedAt"), tomorrowTimestamp)
+            )
+          )
         )
       )
       .collect();
@@ -169,13 +220,27 @@ export const getInboxTasks = query({
     const userId = await ctx.auth.getUserIdentity();
     if (!userId) return [];
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = today.getTime();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowTimestamp = tomorrow.getTime();
+
     const tasks = await ctx.db
       .query("tasks")
       .filter((q) =>
         q.and(
           q.eq(q.field("userId"), userId.tokenIdentifier),
-          q.eq(q.field("status"), "active"),
-          q.eq(q.field("recurrence"), null)
+          q.eq(q.field("recurrence"), null),
+          q.or(
+            q.eq(q.field("status"), "active"),
+            q.and(
+              q.eq(q.field("status"), "completed"),
+              q.gte(q.field("completedAt"), todayTimestamp),
+              q.lt(q.field("completedAt"), tomorrowTimestamp)
+            )
+          )
         )
       )
       .collect();

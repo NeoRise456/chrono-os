@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useEffect } from "react";
-import { Trash2, Repeat, Save, X, Check } from "lucide-react";
+import { Trash2, Repeat, Save, X, Check, ArrowRight } from "lucide-react";
 import { useTodo } from "./todo-context";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -20,7 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export function TaskInspector() {
-  const { selectedTaskId, closeInspector, updateTask, terminateTask, deleteTask } = useTodo();
+  const { selectedTaskId, closeInspector, updateTask, terminateTask, deleteTask, moveToPast } = useTodo();
   const selectedTask = useQuery(api.tasks.getTaskById, { taskId: selectedTaskId! });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -223,12 +223,12 @@ export function TaskInspector() {
                     <Label className="text-[10px] text-muted-foreground font-display uppercase">
                       Recurrence
                     </Label>
-                    <Select value={recurrence} onValueChange={setRecurrence}>
+                    <Select value={recurrence || "none"} onValueChange={(value) => setRecurrence(value === "none" ? undefined : value)}>
                       <SelectTrigger className="font-display text-sm">
                         <SelectValue placeholder="Select recurrence" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No recurrence</SelectItem>
+                        <SelectItem value="none">No recurrence</SelectItem>
                         <SelectItem value="daily">Daily</SelectItem>
                         <SelectItem value="weekly">Weekly</SelectItem>
                         <SelectItem value="monthly">Monthly</SelectItem>
@@ -266,12 +266,12 @@ export function TaskInspector() {
                   <Label className="text-[10px] text-muted-foreground font-display uppercase">
                     Priority
                   </Label>
-                  <Select value={priority} onValueChange={setPriority}>
+                  <Select value={priority || "none"} onValueChange={(value) => setPriority(value === "none" ? undefined : value)}>
                     <SelectTrigger className="font-display text-sm">
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No priority</SelectItem>
+                      <SelectItem value="none">No priority</SelectItem>
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
@@ -392,6 +392,18 @@ export function TaskInspector() {
                 >
                   <Repeat className="size-3 mr-2" />
                   Stop Recurrence
+                </Button>
+              )}
+
+              {isCompleted && !isPastTask && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => moveToPast(selectedTask._id)}
+                  className="w-full font-display"
+                >
+                  <ArrowRight className="size-3 mr-2" />
+                  Move to Past
                 </Button>
               )}
 

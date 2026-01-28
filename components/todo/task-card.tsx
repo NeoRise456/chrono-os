@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, type MouseEvent, type KeyboardEvent } from "react";
+import { useCallback, type KeyboardEvent } from "react";
 import { Clock, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTodo } from "./todo-context";
@@ -21,7 +21,7 @@ export interface TaskCardProps {
   isPastTask?: boolean;
 }
 
-const PRIORITY_COLORS = {
+const PRIORITY_COLORS: Record<string, string> = {
   low: "text-zinc-400",
   medium: "text-amber-400",
   high: "text-red-400",
@@ -40,25 +40,25 @@ export function TaskCard({
   status,
   recurrence,
   dueDate,
-  completedAt,
   tags,
   priority,
   isPastTask = false,
 }: TaskCardProps) {
-  const { selectTask, completeTask } = useTodo();
+  const { selectTask, completeTask, uncompleteTask } = useTodo();
 
   const handleClick = useCallback(() => {
     selectTask(id);
   }, [id, selectTask]);
 
   const handleComplete = useCallback(
-    (e: MouseEvent | KeyboardEvent) => {
-      e.stopPropagation();
-      if (status === "active" && !isPastTask) {
+    (checked: boolean) => {
+      if (checked && status === "active" && !isPastTask) {
         completeTask(id);
+      } else if (!checked && status === "completed" && !isPastTask) {
+        uncompleteTask(id);
       }
     },
-    [id, status, isPastTask, completeTask]
+    [id, status, isPastTask, completeTask, uncompleteTask]
   );
 
   const handleKeyDown = useCallback(
@@ -90,7 +90,7 @@ export function TaskCard({
       <Checkbox
         checked={isCompleted}
         onCheckedChange={handleComplete}
-        disabled={isPastTask || isCompleted}
+        disabled={isPastTask}
         className="flex-shrink-0"
         aria-label={`Mark ${title} as ${isCompleted ? "incomplete" : "complete"}`}
       />

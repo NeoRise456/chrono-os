@@ -11,7 +11,7 @@ import { TaskInspector } from "./task-inspector";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 function TodoDashboardContent() {
-  const { viewMode, isInspectorOpen } = useTodo();
+  const { viewMode, isInspectorOpen, closeInspector } = useTodo();
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -19,7 +19,7 @@ function TodoDashboardContent() {
       <SidebarInset className="min-h-screen bg-background flex flex-col">
         <TodoHeader />
         <main className="flex-1 overflow-hidden relative">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanelGroup  className="h-full">
             {/* Main content */}
             <ResizablePanel defaultSize={80} minSize={30}>
               <div className="h-full">
@@ -36,10 +36,15 @@ function TodoDashboardContent() {
             {isInspectorOpen && (
               <ResizablePanel
                 defaultSize={20}
-                minSize={15}
-                maxSize={40}
+                minSize={120}
+                maxSize={400}
                 collapsible
                 collapsedSize={0}
+                onResize={(panelSize) => {
+                  if (panelSize.inPixels === 0) {
+                    closeInspector();
+                  }
+                }}
               >
                 <div className="h-full border-l border-border bg-sidebar">
                   <TaskInspector />

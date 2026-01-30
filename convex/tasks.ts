@@ -60,30 +60,11 @@ export const completeTask = mutation({
       throw new Error("Task not found or unauthorized");
     }
 
-    if (task.recurrence) {
-      // Create a completed instance for recurring task
-      await ctx.db.insert("tasks", {
-        title: task.title,
-        description: task.description,
-        status: "completed",
-        completedAt: Date.now(),
-        masterTaskId: args.taskId,
-        userId: userId.tokenIdentifier,
-        createdAt: task.createdAt,
-        tags: task.tags,
-        priority: task.priority,
-      });
-
-      // Update due date for next occurrence
-      const nextDueDate = calculateNextDueDate(task.recurrence, task.dueDate || Date.now());
-      await ctx.db.patch(args.taskId, { dueDate: nextDueDate });
-    } else {
-      // Mark one-off task as completed
-      await ctx.db.patch(args.taskId, {
-        status: "completed",
-        completedAt: Date.now(),
-      });
-    }
+    // Mark task as completed with timestamp
+    await ctx.db.patch(args.taskId, {
+      status: "completed",
+      completedAt: Date.now(),
+    });
   },
 });
 
@@ -96,11 +77,6 @@ export const uncompleteTask = mutation({
     const task = await ctx.db.get(args.taskId);
     if (!task || task.userId !== userId.tokenIdentifier) {
       throw new Error("Task not found or unauthorized");
-    }
-
-    // Only uncomplete non-recurring tasks
-    if (task.recurrence) {
-      throw new Error("Cannot uncomplete recurring tasks");
     }
 
     // Mark task as active and clear completedAt
@@ -163,6 +139,41 @@ export const moveToPast = mutation({
   },
 });
 
+export const resetCompletedRecurringTasks = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await ctx.auth.getUserIdentity();
+    if (!userId) throw new Error("Unauthorized");
+
+    const now = Date.now();
+
+    const tasks = await ctx.db
+      .query("tasks")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("userId"), userId.tokenIdentifier),
+          q.neq(q.field("recurrence"), null),
+          q.eq(q.field("status"), "completed"),
+          q.neq(q.field("completedAt"), null)
+        )
+      )
+      .collect();
+
+    let resetCount = 0;
+    for (const task of tasks) {
+      if (task.completedAt && shouldTaskBeReset(task.recurrence!, task.completedAt, now)) {
+        await ctx.db.patch(task._id, {
+          status: "active",
+          completedAt: undefined,
+        });
+        resetCount++;
+      }
+    }
+
+    return resetCount;
+  },
+});
+
 export const getActiveTasks = query({
   args: {},
   handler: async (ctx) => {
@@ -185,12 +196,7 @@ export const getRoutineTasks = query({
     const userId = await ctx.auth.getUserIdentity();
     if (!userId) return [];
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayTimestamp = today.getTime();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowTimestamp = tomorrow.getTime();
+    const now = Date.now();
 
     const tasks = await ctx.db
       .query("tasks")
@@ -200,17 +206,22 @@ export const getRoutineTasks = query({
           q.neq(q.field("recurrence"), null),
           q.or(
             q.eq(q.field("status"), "active"),
-            q.and(
-              q.eq(q.field("status"), "completed"),
-              q.gte(q.field("completedAt"), todayTimestamp),
-              q.lt(q.field("completedAt"), tomorrowTimestamp)
-            )
+            q.eq(q.field("status"), "completed")
           )
         )
       )
       .collect();
 
-    return tasks.filter((task) => !task.isTerminated);
+    return tasks.filter((task) => {
+      if (task.isTerminated) return false;
+
+      // Check if completed recurring task should be reset
+      if (task.status === "completed" && task.recurrence && task.completedAt) {
+        return shouldTaskBeReset(task.recurrence, task.completedAt, now);
+      }
+
+      return true;
+    });
   },
 });
 
@@ -372,4 +383,28 @@ function calculateNextDueDate(recurrence: string, currentDueDate: number): numbe
   }
 
   return date.getTime();
+}
+
+function shouldTaskBeReset(recurrence: string, completedAt: number, now: number): boolean {
+  const completedDate = new Date(completedAt);
+  const nowDate = new Date(now);
+
+  switch (recurrence) {
+    case "daily":
+      // Reset if it's the next calendar day
+      const completedDay = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+      const nowDay = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+      return nowDay.getTime() > completedDay.getTime();
+    case "weekly":
+      // Reset if 7 days have passed
+      const weekLater = new Date(completedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      return nowDate.getTime() >= weekLater.getTime();
+    case "monthly":
+      // Reset if next month has arrived
+      const completedMonth = new Date(completedDate.getFullYear(), completedDate.getMonth(), 1);
+      const nowMonth = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+      return nowMonth.getTime() > completedMonth.getTime();
+    default:
+      return false;
+  }
 }

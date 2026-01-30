@@ -187,8 +187,8 @@
   @apply pointer-events-none opacity-30;
   
   /* CONFIGURATION: Adjust these to change the look */
-  --corner-size: 10px;  /* How long the arms of the corner are */
-  --line-width: 2px;    /* Thickness of the lines */
+  --corner-size: 6px;  /* How long the arms of the corner are */
+  --line-width: 0.8px;    /* Thickness of the lines */
   --color: currentColor; /* Matches the text color */
 
   /* We use 8 gradients (2 per corner) to draw the lines */

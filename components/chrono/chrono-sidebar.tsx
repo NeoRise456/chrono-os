@@ -111,7 +111,7 @@ return (
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarSeparator />
+      
       <SidebarFooter className="p-6">
         <nav className="space-y-4" aria-label="Help navigation">
           {helpItems.map((item) => (

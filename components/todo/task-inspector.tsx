@@ -8,7 +8,6 @@ import { api } from "@/convex/_generated/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -17,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 
 export function TaskInspector() {
   const { selectedTaskId, closeInspector, updateTask, terminateTask, deleteTask, moveToPast } = useTodo();
@@ -25,19 +23,14 @@ export function TaskInspector() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [recurrence, setRecurrence] = useState<string | undefined>();
   const [priority, setPriority] = useState<string | undefined>();
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
 
   const handleReset = useCallback(() => {
     if (selectedTask && !isEditing) {
       setTitle(selectedTask.title);
-      setDescription(selectedTask.description || "");
       setRecurrence(selectedTask.recurrence || undefined);
       setPriority(selectedTask.priority || undefined);
-      setTags(selectedTask.tags || []);
     }
   }, [selectedTask, isEditing]);
 
@@ -50,39 +43,20 @@ export function TaskInspector() {
     await updateTask({
       taskId: selectedTask._id,
       title: title.trim() || selectedTask.title,
-      description: description.trim() || undefined,
       recurrence,
       priority,
-      tags: tags.length > 0 ? tags : undefined,
     });
     setIsEditing(false);
-  }, [selectedTask, title, description, recurrence, priority, tags, updateTask]);
+  }, [selectedTask, title, recurrence, priority, updateTask]);
 
   const handleCancel = useCallback(() => {
     if (selectedTask) {
       setTitle(selectedTask.title);
-      setDescription(selectedTask.description || "");
       setRecurrence(selectedTask.recurrence || undefined);
       setPriority(selectedTask.priority || undefined);
-      setTags(selectedTask.tags || []);
     }
     setIsEditing(false);
   }, [selectedTask]);
-
-  const handleAddTag = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (newTag.trim() && !tags.includes(newTag.trim())) {
-        setTags([...tags, newTag.trim()]);
-        setNewTag("");
-      }
-    },
-    [newTag, tags]
-  );
-
-  const handleRemoveTag = useCallback((tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  }, [tags]);
 
   const isCompleted = selectedTask?.status === "completed" || selectedTask?.isTerminated;
   const isPastTask = isCompleted;
@@ -125,20 +99,23 @@ export function TaskInspector() {
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
-      <div className="px-6 py-4 border-b border-border flex items-center justify-between flex-shrink-0">
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-display">
-            {isPastTask ? "Past Task" : "Active Task"}
-          </p>
-          <h4 className="text-sm font-bold text-foreground font-display truncate">
+      <div className="px-6 py-4  flex items-center gap-4 shrink-0">
+        {isEditing && !isPastTask ? (
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="font-display font-bold text-lg"
+          />
+        ) : (
+          <h4 className="text-lg font-bold text-foreground font-display flex-1">
             {selectedTask.title}
           </h4>
-        </div>
+        )}
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={closeInspector}
-          className="flex-shrink-0"
+          className="shrink-0"
           aria-label="Close inspector"
         >
           <X className="size-4" />
@@ -164,57 +141,6 @@ export function TaskInspector() {
 
           {/* Task Details */}
           <div className="space-y-4">
-            {/* Title */}
-            <div>
-              {isEditing && !isPastTask ? (
-                <div className="space-y-2">
-                  <Label className="text-[10px] text-muted-foreground font-display uppercase">
-                    Title
-                  </Label>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="font-display text-sm"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-display uppercase mb-1">
-                    Title
-                  </p>
-                  <p className="text-sm font-medium text-foreground font-display">
-                    {selectedTask.title}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
-            <div>
-              {isEditing && !isPastTask ? (
-                <div className="space-y-2">
-                  <Label className="text-[10px] text-muted-foreground font-display uppercase">
-                    Description
-                  </Label>
-                  <Textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Add a description..."
-                    className="font-display text-sm resize-none h-24"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-display uppercase mb-1">
-                    Description
-                  </p>
-                  <p className="text-sm text-muted-foreground font-display">
-                    {selectedTask.description || "No description"}
-                  </p>
-                </div>
-              )}
-            </div>
-
             {/* Recurrence (for active tasks) */}
             {!isPastTask && (
               <div>
@@ -285,9 +211,9 @@ export function TaskInspector() {
                   </p>
                   <div className="flex items-center gap-2">
                     {selectedTask.priority ? (
-                      <Badge className="font-display text-xs uppercase">
+                      <span className="text-[10px] px-1.5 py-0.5 border border-border font-mono uppercase tracking-wide">
                         {selectedTask.priority}
-                      </Badge>
+                      </span>
                     ) : (
                       <span className="text-sm text-muted-foreground font-display">
                         No priority
@@ -295,51 +221,6 @@ export function TaskInspector() {
                     )}
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Tags */}
-            <div>
-              <p className="text-[10px] text-muted-foreground font-display uppercase mb-2">
-                Tags
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {(isEditing ? tags : selectedTask.tags)?.map((tag) => (
-                  <Badge key={tag} className="font-display text-xs uppercase">
-                    {isEditing && (
-                      <button
-                        onClick={() => handleRemoveTag(tag)}
-                        className="ml-1 hover:text-foreground"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    )}
-                    {tag}
-                  </Badge>
-                ))}
-                {isEditing && !isPastTask && (
-                  <form onSubmit={handleAddTag} className="flex gap-2">
-                    <Input
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Add tag..."
-                      className="font-display text-sm h-6 w-24"
-                    />
-                    <Button
-                      type="submit"
-                      size="sm"
-                      variant="outline"
-                      className="h-6 px-2 text-xs"
-                    >
-                      Add
-                    </Button>
-                  </form>
-                )}
-              </div>
-              {(!isEditing && !selectedTask.tags?.length) && (
-                <p className="text-xs text-muted-foreground font-display">
-                  No tags
-                </p>
               )}
             </div>
 

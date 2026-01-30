@@ -40,6 +40,7 @@ interface TodoContextType extends TodoState {
   terminateTask: (taskId: Id<"tasks">) => Promise<void>;
   deleteTask: (taskId: Id<"tasks">) => Promise<void>;
   moveToPast: (taskId: Id<"tasks">) => Promise<void>;
+  resetCompletedRecurringTasks: () => Promise<number>;
 }
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -90,6 +91,7 @@ export function TodoProvider({ children }: TodoProviderProps) {
   const terminateTaskMutation = useMutation(api.tasks.terminateTask);
   const deleteTaskMutation = useMutation(api.tasks.deleteTask);
   const moveToPastMutation = useMutation(api.tasks.moveToPast);
+  const resetCompletedRecurringTasksMutation = useMutation(api.tasks.resetCompletedRecurringTasks);
 
   const createTask = useCallback(
     async (args: {
@@ -155,6 +157,13 @@ export function TodoProvider({ children }: TodoProviderProps) {
     [moveToPastMutation]
   );
 
+  const resetCompletedRecurringTasks = useCallback(
+    async () => {
+      return await resetCompletedRecurringTasksMutation({});
+    },
+    [resetCompletedRecurringTasksMutation]
+  );
+
   return (
     <TodoContext.Provider
       value={{
@@ -170,6 +179,7 @@ export function TodoProvider({ children }: TodoProviderProps) {
         terminateTask,
         deleteTask,
         moveToPast,
+        resetCompletedRecurringTasks,
       }}
     >
       {children}

@@ -81,9 +81,9 @@ export function TaskCard({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        "group flex items-center gap-4 p-4 tech-border cursor-pointer transition-all",
+        "group flex items-center gap-4 p-4 tech-full-border border cursor-pointer transition-all",
         "hover:bg-zinc-900/40",
-        isCompleted ? "border-transparent" : "border-border",
+        isCompleted ? "" : "",
         opacityClass
       )}
     >
@@ -91,7 +91,7 @@ export function TaskCard({
         checked={isCompleted}
         onCheckedChange={handleComplete}
         disabled={isPastTask}
-        className="flex-shrink-0"
+        className="shrink-0"
         aria-label={`Mark ${title} as ${isCompleted ? "incomplete" : "complete"}`}
       />
 
@@ -111,7 +111,7 @@ export function TaskCard({
         )}
       </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
         {recurrence && !isPastTask && (
           <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 border border-border text-muted-foreground font-display uppercase tracking-wide">
             <Repeat className="size-3" />

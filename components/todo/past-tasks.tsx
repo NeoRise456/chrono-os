@@ -106,19 +106,7 @@ export function PastTasks() {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col">
-        <div className="px-6 py-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-bold uppercase tracking-widest font-display text-foreground">
-              Past Tasks
-            </h3>
-            <span className="text-xs text-muted-foreground font-display">
-              {sortedTasks.length}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground font-display">
-            Completed & terminated tasks
-          </p>
-        </div>
+        
 
         <ScrollArea className="flex-1">
           <div className="p-3 space-y-1">
@@ -152,7 +140,7 @@ export function PastTasks() {
                     />
                   </div>
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-3 shrink-0">
                     {completedDate && (
                       <p className="text-[10px] text-muted-foreground font-display">
                         Finished: {completedDate}

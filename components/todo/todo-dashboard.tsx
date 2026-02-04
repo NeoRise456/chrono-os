@@ -6,12 +6,11 @@ import { TodoProvider, useTodo } from "./todo-context";
 import { ChronoSidebar } from "@/components/chrono/chrono-sidebar";
 import { TodoHeader } from "./todo-header";
 import { ActiveWorkspace } from "./active-workspace";
-import { PastTasks } from "./past-tasks";
 import { TaskInspector } from "./task-inspector";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 function TodoDashboardContent() {
-  const { viewMode, isInspectorOpen, closeInspector } = useTodo();
+  const { isInspectorOpen, closeInspector } = useTodo();
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -19,11 +18,11 @@ function TodoDashboardContent() {
       <SidebarInset className="min-h-screen bg-background flex flex-col">
         <TodoHeader />
         <main className="flex-1 overflow-hidden relative">
-          <ResizablePanelGroup  className="h-full">
+          <ResizablePanelGroup  className="h-full" suppressHydrationWarning>
             {/* Main content */}
-            <ResizablePanel defaultSize={80} minSize={30}>
+            <ResizablePanel defaultSize={80} minSize={30} suppressHydrationWarning>
               <div className="h-full">
-                {viewMode === "active" ? <ActiveWorkspace /> : <PastTasks />}
+                <ActiveWorkspace />
               </div>
             </ResizablePanel>
 
@@ -40,6 +39,7 @@ function TodoDashboardContent() {
                 maxSize={400}
                 collapsible
                 collapsedSize={0}
+                suppressHydrationWarning
                 onResize={(panelSize) => {
                   if (panelSize.inPixels === 0) {
                     closeInspector();

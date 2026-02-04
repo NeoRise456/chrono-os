@@ -121,24 +121,6 @@ export const deleteTask = mutation({
   },
 });
 
-export const moveToPast = mutation({
-  args: { taskId: v.id("tasks") },
-  handler: async (ctx, args) => {
-    const userId = await ctx.auth.getUserIdentity();
-    if (!userId) throw new Error("Unauthorized");
-
-    const task = await ctx.db.get(args.taskId);
-    if (!task || task.userId !== userId.tokenIdentifier) {
-      throw new Error("Task not found or unauthorized");
-    }
-
-    await ctx.db.patch(args.taskId, {
-      status: "completed",
-      completedAt: Date.now(),
-    });
-  },
-});
-
 export const resetCompletedRecurringTasks = mutation({
   args: {},
   handler: async (ctx) => {
@@ -215,11 +197,6 @@ export const getRoutineTasks = query({
     return tasks.filter((task) => {
       if (task.isTerminated) return false;
 
-      // Check if completed recurring task should be reset
-      if (task.status === "completed" && task.recurrence && task.completedAt) {
-        return shouldTaskBeReset(task.recurrence, task.completedAt, now);
-      }
-
       return true;
     });
   },
@@ -260,26 +237,6 @@ export const getInboxTasks = query({
   },
 });
 
-export const getPastTasks = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await ctx.auth.getUserIdentity();
-    if (!userId) return [];
-
-    const tasks = await ctx.db
-      .query("tasks")
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("userId"), userId.tokenIdentifier),
-          q.eq(q.field("status"), "completed")
-        )
-      )
-      .collect();
-
-    return tasks;
-  },
-});
-
 export const getTaskById = query({
   args: { taskId: v.id("tasks") },
   handler: async (ctx, args) => {
@@ -292,76 +249,6 @@ export const getTaskById = query({
     }
 
     return task;
-  },
-});
-
-export const getRetentionPeriod = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await ctx.auth.getUserIdentity();
-    if (!userId) return 30;
-
-    const settings = await ctx.db
-      .query("settings")
-      .withIndex("by_user", (q) => q.eq("userId", userId.tokenIdentifier))
-      .first();
-
-    return settings?.retentionPeriod ?? 30;
-  },
-});
-
-export const updateRetentionPeriod = mutation({
-  args: { retentionPeriod: v.number() },
-  handler: async (ctx, args) => {
-    const userId = await ctx.auth.getUserIdentity();
-    if (!userId) throw new Error("Unauthorized");
-
-    const settings = await ctx.db
-      .query("settings")
-      .withIndex("by_user", (q) => q.eq("userId", userId.tokenIdentifier))
-      .first();
-
-    if (settings) {
-      await ctx.db.patch(settings._id, { retentionPeriod: args.retentionPeriod });
-    } else {
-      await ctx.db.insert("settings", {
-        userId: userId.tokenIdentifier,
-        retentionPeriod: args.retentionPeriod,
-      });
-    }
-  },
-});
-
-export const cleanupOldTasks = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await ctx.auth.getUserIdentity();
-    if (!userId) throw new Error("Unauthorized");
-
-    const settings = await ctx.db
-      .query("settings")
-      .withIndex("by_user", (q) => q.eq("userId", userId.tokenIdentifier))
-      .first();
-
-    const retentionDays = settings?.retentionPeriod ?? 30;
-    const cutoffDate = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
-
-    const oldTasks = await ctx.db
-      .query("tasks")
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("userId"), userId.tokenIdentifier),
-          q.eq(q.field("status"), "completed"),
-          q.lt(q.field("completedAt"), cutoffDate)
-        )
-      )
-      .collect();
-
-    for (const task of oldTasks) {
-      await ctx.db.delete(task._id);
-    }
-
-    return oldTasks.length;
   },
 });
 

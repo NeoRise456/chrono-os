@@ -10,14 +10,14 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function ActiveWorkspace() {
-  const { viewMode, setViewMode, createTask, resetCompletedRecurringTasks } = useTodo();
+  const { createTask, resetCompletedRecurringTasks } = useTodo();
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
   const routineTasks = useQuery(api.tasks.getRoutineTasks) ?? [];
   const inboxTasks = useQuery(api.tasks.getInboxTasks) ?? [];
 
   useEffect(() => {
-    resetCompletedRecurringTasks();
+    resetCompletedRecurringTasks().catch(() => {});
   }, []);
 
   const handleCreateTask = useCallback(
@@ -37,37 +37,14 @@ export function ActiveWorkspace() {
   return (
     <div className="flex flex-col h-full">
       {/* Header with title and tab buttons */}
-      <div className="px-4 py-2 border-b border-border shrink-0 h-16 flex items-center justify-between">
+      <div className="px-4 py-2 border-b border-border shrink-0 h-16 flex items-center">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-0.5 font-display">
             Task Manager
           </p>
           <h3 className="text-base font-bold text-foreground font-display">
-            {viewMode === "active" ? "Active Workspace" : "Past Tasks"}
+            Active Workspace
           </h3>
-        </div>
-        
-        <div className="flex items-center gap-1 border border-border">
-          <button
-            onClick={() => setViewMode("active")}
-            className={`px-4 py-2 text-sm font-display uppercase tracking-wider transition-colors border-r border-border ${
-              viewMode === "active"
-                ? "bg-foreground text-background"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Active
-          </button>
-          <button
-            onClick={() => setViewMode("past")}
-            className={`px-4 py-2 text-sm font-display uppercase tracking-wider transition-colors ${
-              viewMode === "past"
-                ? "bg-foreground text-background"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Past
-          </button>
         </div>
       </div>
 
@@ -76,7 +53,7 @@ export function ActiveWorkspace() {
         {/* Routine Column */}
         <div className="flex-1 flex flex-col border-r border-border min-w-0">
 
-          <div className="px-6 py-3 shrink-0">
+          <div className="px-3 py-3 shrink-0">
             <form onSubmit={handleCreateTask} className="flex items-center gap-3 bg-zinc-900/30 p-3 border border-border hover:border-muted-foreground/50 transition-colors group">
               <Plus className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               <Input

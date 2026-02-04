@@ -19,8 +19,4 @@ export default defineSchema({
     .index("by_status_recurrence", ["status", "recurrence"])
     .index("by_user", ["userId"])
     .index("by_due_date", ["dueDate"]),
-  settings: defineTable({
-    userId: v.string(),
-    retentionPeriod: v.number(), // Days to keep past tasks (5-30, default 30)
-  }).index("by_user", ["userId"]),
 });

@@ -5,16 +5,12 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
-type ViewMode = "active" | "past";
-
 interface TodoState {
-  viewMode: ViewMode;
   selectedTaskId: Id<"tasks"> | null;
   isInspectorOpen: boolean;
 }
 
 interface TodoContextType extends TodoState {
-  setViewMode: (mode: ViewMode) => void;
   selectTask: (taskId: Id<"tasks"> | null) => void;
   openInspector: () => void;
   closeInspector: () => void;
@@ -39,7 +35,6 @@ interface TodoContextType extends TodoState {
   uncompleteTask: (taskId: Id<"tasks">) => Promise<void>;
   terminateTask: (taskId: Id<"tasks">) => Promise<void>;
   deleteTask: (taskId: Id<"tasks">) => Promise<void>;
-  moveToPast: (taskId: Id<"tasks">) => Promise<void>;
   resetCompletedRecurringTasks: () => Promise<number>;
 }
 
@@ -59,14 +54,9 @@ interface TodoProviderProps {
 
 export function TodoProvider({ children }: TodoProviderProps) {
   const [state, setState] = useState<TodoState>({
-    viewMode: "active",
     selectedTaskId: null,
     isInspectorOpen: false,
   });
-
-  const setViewMode = useCallback((mode: ViewMode) => {
-    setState((prev) => ({ ...prev, viewMode: mode }));
-  }, []);
 
   const selectTask = useCallback((taskId: Id<"tasks"> | null) => {
     setState((prev) => ({
@@ -90,7 +80,6 @@ export function TodoProvider({ children }: TodoProviderProps) {
   const uncompleteTaskMutation = useMutation(api.tasks.uncompleteTask);
   const terminateTaskMutation = useMutation(api.tasks.terminateTask);
   const deleteTaskMutation = useMutation(api.tasks.deleteTask);
-  const moveToPastMutation = useMutation(api.tasks.moveToPast);
   const resetCompletedRecurringTasksMutation = useMutation(api.tasks.resetCompletedRecurringTasks);
 
   const createTask = useCallback(
@@ -150,13 +139,6 @@ export function TodoProvider({ children }: TodoProviderProps) {
     [deleteTaskMutation]
   );
 
-  const moveToPast = useCallback(
-    async (taskId: Id<"tasks">) => {
-      await moveToPastMutation({ taskId });
-    },
-    [moveToPastMutation]
-  );
-
   const resetCompletedRecurringTasks = useCallback(
     async () => {
       return await resetCompletedRecurringTasksMutation({});
@@ -168,7 +150,6 @@ export function TodoProvider({ children }: TodoProviderProps) {
     <TodoContext.Provider
       value={{
         ...state,
-        setViewMode,
         selectTask,
         openInspector,
         closeInspector,
@@ -178,7 +159,6 @@ export function TodoProvider({ children }: TodoProviderProps) {
         uncompleteTask,
         terminateTask,
         deleteTask,
-        moveToPast,
         resetCompletedRecurringTasks,
       }}
     >

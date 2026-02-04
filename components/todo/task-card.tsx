@@ -18,7 +18,6 @@ export interface TaskCardProps {
   dueDate?: number;
   tags?: string[];
   priority?: string;
-  isPastTask?: boolean;
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -42,7 +41,6 @@ export function TaskCard({
   dueDate,
   tags,
   priority,
-  isPastTask = false,
 }: TaskCardProps) {
   const { selectTask, completeTask, uncompleteTask } = useTodo();
 
@@ -52,13 +50,13 @@ export function TaskCard({
 
   const handleComplete = useCallback(
     (checked: boolean) => {
-      if (checked && status === "active" && !isPastTask) {
+      if (checked && status === "active") {
         completeTask(id);
-      } else if (!checked && status === "completed" && !isPastTask) {
+      } else if (!checked && status === "completed") {
         uncompleteTask(id);
       }
     },
-    [id, status, isPastTask, completeTask, uncompleteTask]
+    [id, status, completeTask, uncompleteTask]
   );
 
   const handleKeyDown = useCallback(
@@ -72,7 +70,7 @@ export function TaskCard({
   );
 
   const isCompleted = status === "completed" || status === "terminated";
-  const opacityClass = isCompleted || isPastTask ? "opacity-50" : "opacity-100";
+  const opacityClass = isCompleted ? "opacity-50" : "opacity-100";
 
   return (
     <div
@@ -90,7 +88,6 @@ export function TaskCard({
       <Checkbox
         checked={isCompleted}
         onCheckedChange={handleComplete}
-        disabled={isPastTask}
         className="shrink-0"
         aria-label={`Mark ${title} as ${isCompleted ? "incomplete" : "complete"}`}
       />
@@ -104,7 +101,7 @@ export function TaskCard({
         >
           {title}
         </p>
-        {description && !isPastTask && (
+        {description && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">
             {description}
           </p>
@@ -112,14 +109,14 @@ export function TaskCard({
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
-        {recurrence && !isPastTask && (
+        {recurrence && (
           <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 border border-border text-muted-foreground font-display uppercase tracking-wide">
             <Repeat className="size-3" />
             <span>{RECURRENCE_LABELS[recurrence] || recurrence}</span>
           </div>
         )}
 
-        {dueDate && !isPastTask && !recurrence && (
+        {dueDate && !recurrence && (
           <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 border border-border text-muted-foreground font-display uppercase tracking-wide">
             <Clock className="size-3" />
             <span>
@@ -131,7 +128,7 @@ export function TaskCard({
           </div>
         )}
 
-        {priority && !isPastTask && (
+        {priority && (
           <span
             className={cn(
               "text-[10px] px-1.5 py-0.5 border border-border font-mono uppercase tracking-wide",
@@ -142,7 +139,7 @@ export function TaskCard({
           </span>
         )}
 
-        {tags && tags.length > 0 && !isPastTask && (
+        {tags && tags.length > 0 && (
           <div className="flex items-center gap-1">
             {tags.slice(0, 2).map((tag) => (
               <span

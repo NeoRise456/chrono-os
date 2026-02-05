@@ -16,18 +16,19 @@ import {
   FocusTrendCard,
   HabitDensityMap,
 } from "./stats"
-import { useMutation, useQuery } from "convex/react"
+import { useMutation, useQuery, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 
 function HabitsDashboardContent() {
   const { isToday } = useHabitsContext()
+  const { isAuthenticated } = useConvexAuth()
   const createDefaultHabits = useMutation(api.habits.createDefaultHabits)
 
   useEffect(() => {
-    if (isToday) {
+    if (isToday && isAuthenticated) {
       createDefaultHabits({}).catch(console.error)
     }
-  }, [isToday, createDefaultHabits])
+  }, [isToday, isAuthenticated, createDefaultHabits])
 
   return (
     <>

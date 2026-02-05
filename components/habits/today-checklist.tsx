@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
 import { useHabitsContext } from "./habits-provider"
 import { HabitItem } from "./habit-item"
 import { useQuery } from "convex/react"
@@ -12,10 +11,6 @@ export function TodayChecklist() {
   const dateStr = formatDate(selectedDate)
 
   const habits = useQuery(api.habits.getHabitsWithStatus, { date: dateStr })
-
-  const streakQueries = habits?.map((habit) =>
-    useQuery(api.habitStats.getStreakForHabit, { habitId: habit._id })
-  )
 
   if (!habits) {
     return <div className="p-8 text-center text-muted-foreground font-display">Loading habits...</div>
@@ -65,12 +60,11 @@ export function TodayChecklist() {
             <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-display">
               PENDING
             </h3>
-            {pending.map((habit, index) => (
+            {pending.map((habit) => (
               <HabitItem
                 key={habit._id}
                 habit={habit}
                 todayCount={habit.todayCount}
-                streak={streakQueries?.[habits.indexOf(habit)] ?? { current: 0, hasShield: false }}
               />
             ))}
           </div>
@@ -86,7 +80,6 @@ export function TodayChecklist() {
                 key={habit._id}
                 habit={habit}
                 todayCount={habit.todayCount}
-                streak={streakQueries?.[habits.indexOf(habit)] ?? { current: 0, hasShield: false }}
               />
             ))}
           </div>
@@ -102,7 +95,6 @@ export function TodayChecklist() {
                 key={habit._id}
                 habit={habit}
                 todayCount={habit.todayCount}
-                streak={streakQueries?.[habits.indexOf(habit)] ?? { current: 0, hasShield: false }}
               />
             ))}
           </div>
@@ -111,3 +103,4 @@ export function TodayChecklist() {
     </div>
   )
 }
+

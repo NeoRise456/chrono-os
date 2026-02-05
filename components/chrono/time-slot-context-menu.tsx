@@ -26,9 +26,9 @@ export function TimeSlotContextMenu({
   hour,
   minute = 0,
 }: TimeSlotContextMenuProps) {
-  const { state, addScheduleCard } = useChrono()
+  const { editMode, addScheduleCard, scheduleCards } = useChrono()
 
-  if (state.editMode !== "edit") {
+  if (editMode !== "edit") {
     return <>{children}</>
   }
 
@@ -41,7 +41,7 @@ export function TimeSlotContextMenu({
         </ContextMenuLabel>
         <ContextMenuSeparator />
         <ContextMenuLabel className="text-xs">Add Schedule Card</ContextMenuLabel>
-        {state.masterCards.map((masterCard) => (
+        {scheduleCards.map((masterCard) => (
           <ContextMenuItem
             key={masterCard.id}
             onClick={() => addScheduleCard(masterCard.id, day, hour, minute)}

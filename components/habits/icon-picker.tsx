@@ -17,6 +17,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
       <div className="grid grid-cols-10 gap-1.5">
         {HABIT_ICONS.map((iconName) => {
           const Icon = Icons[iconName as keyof typeof Icons] as React.ComponentType<{ className?: string }>
+          if (!Icon) return null
           const isSelected = value === iconName
 
           return (

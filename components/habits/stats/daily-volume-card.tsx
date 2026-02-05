@@ -24,22 +24,24 @@ export function DailyVolumeCard() {
   const dateStr = formatDate(today)
 
   const volume = useQuery(api.habitStats.getDailyVolume, { date: dateStr })
-  const progress = useQuery(api.habitStats.getConsistencyRate, { days: 7 })
+  const volumeHistory = useQuery(api.habitStats.getDailyVolumeHistory, { days: 7 }) ?? []
 
   const chartData = useMemo(() => {
-    const data = []
-    const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - (6 - i))
-      data.push({
-        day: days[date.getDay() === 0 ? 6 : date.getDay() - 1],
-        tasks: 40 + Math.random() * 50,
-        isHighlight: i === 6,
-      })
+    if (!volumeHistory || volumeHistory.length === 0) {
+      return []
     }
-    return data
-  }, [])
+
+    const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    return volumeHistory.map((entry) => {
+      const date = new Date(entry.date)
+      const dayLabel = days[date.getDay() === 0 ? 6 : date.getDay() - 1]
+      return {
+        day: dayLabel,
+        tasks: entry.percentage,
+        isHighlight: entry.dayIndex === volumeHistory.length - 1,
+      }
+    })
+  }, [volumeHistory])
 
   return (
     <div className="col-span-1 md:col-span-4 bg-card p-6 h-80 flex flex-col tech-border text-muted-foreground">

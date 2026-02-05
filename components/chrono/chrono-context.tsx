@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useState,
   type ReactNode,
 } from "react"
 import { useQuery, useMutation } from "convex/react"
@@ -44,9 +45,9 @@ export function ChronoProvider({ children }: { children: ReactNode }) {
   const deleteScheduleCardMutation = useMutation(api.scheduleCards.deleteScheduleCard)
   const duplicateToDayMutation = useMutation(api.scheduleCards.duplicateToDay)
 
-  const [editMode, setEditModeInternal] = React.useState<EditMode>("view")
-  const [selectedCardId, setSelectedCardId] = React.useState<string | null>(null)
-  const [dragState, setDragState] = React.useState<DragState | null>(null)
+  const [editMode, setEditModeInternal] = useState<EditMode>("view")
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+  const [dragState, setDragState] = useState<DragState | null>(null)
 
   const toggleEditMode = useCallback(() => {
     setEditModeInternal((prev) => (prev === "view" ? "edit" : "view"))

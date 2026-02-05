@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useHabitsContext } from "./habits-provider"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { formatDate } from "./utils"
 
@@ -25,10 +25,10 @@ interface HabitItemProps {
     isTracked: boolean
   }
   todayCount: number
-  streak: { current: number; hasShield: boolean }
 }
 
-export function HabitItem({ habit, todayCount, streak }: HabitItemProps) {
+export function HabitItem({ habit, todayCount }: HabitItemProps) {
+  const streak = useQuery(api.habitStats.getStreakForHabit, { habitId: habit._id }) ?? { current: 0, best: 0, hasShield: false }
   const { selectedDate, openEditSheet } = useHabitsContext()
   const logHabit = useMutation(api.habitLogs.logHabit)
   const unlogHabit = useMutation(api.habitLogs.unlogHabit)
@@ -56,14 +56,13 @@ export function HabitItem({ habit, todayCount, streak }: HabitItemProps) {
   }
 
   return (
-    <div className="group relative bg-card border border-border p-4 tech-border hover:border-foreground/30 transition-colors">
+    <div className="group relative bg-card border border-border p-4 tech-full-border hover:border-foreground/30 transition-colors">
       <div className="flex items-start gap-4">
         <div className="flex items-center gap-3 flex-1">
           {habit.isTracked && (
             <Checkbox
               checked={isCompleted}
               onCheckedChange={handleToggle}
-              className="mt-0.5"
               aria-label={`Toggle ${habit.name}`}
             />
           )}
@@ -74,7 +73,12 @@ export function HabitItem({ habit, todayCount, streak }: HabitItemProps) {
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              {Icon && <Icon className="size-4 shrink-0" style={{ color: habit.color }} />}
+            {Icon && (
+              <span style={{ color: habit.color }} className="flex items-center justify-center">
+                {/* El Icono hereda el color del span */}
+                <Icon className="size-4 shrink-0" />
+              </span>
+            )}
               <h3 className="font-medium font-display truncate text-foreground">
                 {habit.name}
               </h3>
@@ -114,7 +118,7 @@ export function HabitItem({ habit, todayCount, streak }: HabitItemProps) {
               >
                 <Icons.Minus className="size-3" />
               </Button>
-              <span className="text-sm font-mono tabular-nums w-8 text-center font-display">
+              <span className="text-sm font-mono tabular-nums w-8 text-center">
                 {todayCount}/{habit.targetCount}
               </span>
               <Button

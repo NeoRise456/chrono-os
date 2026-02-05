@@ -29,22 +29,29 @@ export function ConsistencyRateCard() {
   startDate.setDate(startDate.getDate() - 29)
 
   const consistency = useQuery(api.habitStats.getConsistencyRate, { days: 30 })
+  const consistencyHistory = useQuery(api.habitStats.getConsistencyRateHistory, { days: 30 })
 
   const chartData = useMemo(() => {
+    if (!consistencyHistory || consistencyHistory.length === 0) {
+      return []
+    }
+
     const data = []
-    for (let i = 0; i < 11; i++) {
-      const date = new Date(startDate)
-      date.setDate(date.getDate() + Math.floor(i * 3))
-      if (date > today) break
+    const sampleEvery = Math.max(1, Math.floor(consistencyHistory.length / 11))
+
+    for (let i = 0; i < consistencyHistory.length; i += sampleEvery) {
+      const entry = consistencyHistory[i]
+      const date = new Date(entry.date)
       const time = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })
       data.push({
         time,
-        current: 65 + Math.random() * 25,
-        previous: 55 + Math.random() * 25,
+        current: entry.rate,
+        previous: i > 0 ? consistencyHistory[i - sampleEvery]?.rate ?? 0 : 0,
       })
     }
+
     return data
-  }, [])
+  }, [consistencyHistory])
 
   return (
     <div className="col-span-1 md:col-span-4 bg-card p-6 h-80 flex flex-col justify-between tech-border text-muted-foreground">
@@ -82,7 +89,7 @@ export function ConsistencyRateCard() {
               </linearGradient>
             </defs>
             <XAxis dataKey="time" hide />
-            <YAxis domain={[60, 100]} hide />
+            <YAxis domain={[0, 100]} hide />
             <ChartTooltip
               content={
                 <ChartTooltipContent

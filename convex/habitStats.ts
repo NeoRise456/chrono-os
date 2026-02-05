@@ -154,6 +154,56 @@ export const getOverallStreak = query({
   },
 });
 
+export const getConsistencyRateHistory = query({
+  args: { days: v.number() },
+  handler: async (ctx, args) => {
+    const userId = await ctx.auth.getUserIdentity();
+    if (!userId) return [];
+
+    const habits = await ctx.db
+      .query("habits")
+      .withIndex("by_user_active", (q) => q.eq("userId", userId.tokenIdentifier).eq("isArchived", false))
+      .collect();
+
+    const trackedHabits = habits.filter((h) => h.isTracked && h.frequency === "daily");
+    if (trackedHabits.length === 0) {
+      return [];
+    }
+
+    const results = [];
+    const today = new Date();
+
+    for (let i = 0; i < args.days; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - (args.days - 1 - i));
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+      let completed = 0;
+      const total = trackedHabits.length;
+
+      for (const habit of trackedHabits) {
+        const log = await ctx.db
+          .query("habitLogs")
+          .withIndex("by_habit_date", (q) => q.eq("habitId", habit._id).eq("date", dateStr))
+          .first();
+
+        if (log && log.count >= habit.targetCount) {
+          completed++;
+        }
+      }
+
+      const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      results.push({
+        date: dateStr,
+        rate,
+      });
+    }
+
+    return results.reverse();
+  },
+});
+
 export const getConsistencyRate = query({
   args: { days: v.number() },
   handler: async (ctx, args) => {
@@ -198,6 +248,57 @@ export const getConsistencyRate = query({
     const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return { rate, completed, total };
+  },
+});
+
+export const getDailyVolumeHistory = query({
+  args: { days: v.number() },
+  handler: async (ctx, args) => {
+    const userId = await ctx.auth.getUserIdentity();
+    if (!userId) return [];
+
+    const habits = await ctx.db
+      .query("habits")
+      .withIndex("by_user_active", (q) => q.eq("userId", userId.tokenIdentifier).eq("isArchived", false))
+      .collect();
+
+    const trackedHabits = habits.filter((h) => h.isTracked && h.frequency === "daily");
+    const total = trackedHabits.length;
+
+    if (total === 0) {
+      return [];
+    }
+
+    const results = [];
+    const today = new Date();
+
+    for (let i = 0; i < args.days; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - (args.days - 1 - i));
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+      const logs = await Promise.all(
+        trackedHabits.map((habit) =>
+          ctx.db
+            .query("habitLogs")
+            .withIndex("by_habit_date", (q) => q.eq("habitId", habit._id).eq("date", dateStr))
+            .first()
+        )
+      );
+
+      const completed = logs.filter((log) => log && log.count >= trackedHabits[logs.indexOf(log)!].targetCount).length;
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      results.push({
+        date: dateStr,
+        completed,
+        total,
+        percentage,
+        dayIndex: i,
+      });
+    }
+
+    return results;
   },
 });
 

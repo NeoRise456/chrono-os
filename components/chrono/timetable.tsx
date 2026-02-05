@@ -42,7 +42,7 @@ interface DayColumnProps {
 }
 
 function DayColumn({ day }: DayColumnProps) {
-  const { state, getCardsForDay, addScheduleCard } = useChrono()
+  const { editMode, selectedCardId, getCardsForDay, addScheduleCard } = useChrono()
   const columnRef = useRef<HTMLDivElement>(null)
   const cards = getCardsForDay(day)
   const isToday = new Date().getDay() === (day + 1) % 7 // JS: 0 = Sunday
@@ -75,7 +75,7 @@ function DayColumn({ day }: DayColumnProps) {
       ref={columnRef}
       className={cn(
         "flex-1 min-w-0 border-r border-border last:border-r-0 relative",
-        state.editMode === "edit" && "hover:bg-accent/30 transition-colors"
+        editMode === "edit" && "hover:bg-accent/30 transition-colors"
       )}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -99,7 +99,7 @@ function DayColumn({ day }: DayColumnProps) {
             <div
               className={cn(
                 "border-b border-border transition-colors",
-                state.editMode === "edit" && "hover:bg-accent/50"
+                editMode === "edit" && "hover:bg-accent/50"
               )}
               style={{ height: `${SCHEDULE_CONFIG.SLOT_HEIGHT_PX}px` }}
             >
@@ -117,7 +117,7 @@ function DayColumn({ day }: DayColumnProps) {
           <ScheduleCard
             key={card.id}
             card={card}
-            isSelected={state.selectedCardId === card.id}
+            isSelected={selectedCardId === card.id}
           />
         ))}
       </div>
@@ -130,8 +130,8 @@ interface TimetableProps {
 }
 
 export function Timetable({ onEditModeChange }: TimetableProps) {
-  const { state, toggleEditMode } = useChrono()
-  const isEditing = state.editMode === "edit"
+  const { editMode, toggleEditMode } = useChrono()
+  const isEditing = editMode === "edit"
 
   const handleEditToggle = useCallback(() => {
     const newEditState = !isEditing

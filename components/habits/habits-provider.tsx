@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useReducer, useCallback, useEffect } from "react"
 import { Id } from "@/convex/_generated/dataModel"
-import { formatDate, subtractDays } from "./utils"
+import { formatDate, subtractDays, addDays } from "./utils"
 
 export type ViewMode = "checklist" | "grid"
 
@@ -47,7 +47,7 @@ function habitsReducer(state: HabitsUIState, action: HabitsUIAction): HabitsUISt
     case "SET_DATE":
       return { ...state, selectedDate: action.payload }
     case "NAVIGATE_DATE":
-      return { ...state, selectedDate: subtractDays(state.selectedDate, action.payload) }
+      return { ...state, selectedDate: addDays(state.selectedDate, action.payload) }
     case "SET_VIEW_MODE":
       return { ...state, viewMode: action.payload }
     default:

@@ -27,6 +27,11 @@ import {
 
 const navItems = [
   {
+    title: "Habits",
+    href: "/habits",
+    icon: Repeat,
+  },
+  {
     title: "Schedule",
     href: "/schedule",
     icon: Calendar,
@@ -35,11 +40,6 @@ const navItems = [
     title: "Todos",
     href: "/todos",
     icon: CheckSquare,
-  },
-  {
-    title: "Habits",
-    href: "/habits",
-    icon: Repeat,
   },
   {
     title: "Goals",

@@ -3,6 +3,7 @@ import { convex } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
+import { v } from "convex/values";
 import { betterAuth } from "better-auth/minimal";
 import authConfig from "./auth.config";
 
@@ -36,11 +37,27 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
   })
 }
 
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
 export const getCurrentUser = query({
   args: {},
+  returns: v.union(v.null(), v.object({
+    _id: v.string(),
+    _creationTime: v.number(),
+    name: v.string(),
+    email: v.string(),
+    image: v.union(v.string(), v.null()),
+  })),
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+    const user = await authComponent.getAuthUser(ctx);
+    return {
+      _id: user._id,
+      _creationTime: user._creationTime,
+      name: user.name,
+      email: user.email,
+      image: user.image ?? null,
+    };
   },
 });

@@ -4,15 +4,14 @@ import Link from "next/link"
 import { Github, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
-import { router } from "better-auth/api"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 
 
 
 function SyncTime() {
   const [time, setTime] = useState<string | null>(null);
-  
+
 
   useEffect(() => {
     const updateTime = () => {
@@ -43,12 +42,13 @@ function SyncTime() {
 
 export default function LoginPage() {
 
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/habits";
 
   async function handleGithubSignIn() {
     const {error} = await authClient.signIn.social({
       provider: "github",
-      callbackURL: "/habits"
+      callbackURL: callbackUrl
     });
 
 

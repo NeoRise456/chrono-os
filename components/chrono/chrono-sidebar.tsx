@@ -6,11 +6,13 @@ import {
   Target,
   Repeat,
   Settings,
-  HelpCircle,
-  Book,
+  LogOut,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useQuery, useConvexAuth } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { authClient } from "@/lib/auth-client"
 
 import {
   Sidebar,
@@ -53,21 +55,10 @@ const navItems = [
   },
 ]
 
-const helpItems = [
-  {
-    title: "Help Center",
-    href: "/help",
-    icon: HelpCircle,
-  },
-  {
-    title: "User Guide",
-    href: "/guide",
-    icon: Book,
-  },
-]
-
 export function ChronoSidebar() {
   const pathname = usePathname()
+  const { isAuthenticated } = useConvexAuth()
+  const user = useQuery(api.auth.getCurrentUser, isAuthenticated ? {} : "skip")
 
 return (
     <Sidebar collapsible="offcanvas" className="border-r border-border">
@@ -113,18 +104,42 @@ return (
       </SidebarContent>
       
       <SidebarFooter className="p-6">
-        <nav className="space-y-4" aria-label="Help navigation">
-          {helpItems.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors font-display"
-            >
-              <item.icon className="size-[18px]" aria-hidden="true" />
-              {item.title}
-            </Link>
-          ))}
-        </nav>
+        <div className="space-y-4">
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 border-t border-border pt-4">
+                {user.image && (
+                  <img
+                    src={user.image}
+                    alt=""
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate font-display">
+                    {user.name || "User"}
+                  </p>
+                  {user.email && (
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => authClient.signOut()}
+                className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors font-display w-full"
+              >
+                <LogOut className="size-[18px]" aria-hidden="true" />
+                <span>SIGN_OUT</span>
+              </button>
+            </>
+          ) : (
+            <div className="text-xs text-muted-foreground font-display">
+              LOADING_USER...
+            </div>
+          )}
+        </div>
       </SidebarFooter>
     </Sidebar>
   )

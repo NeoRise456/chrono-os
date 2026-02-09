@@ -16,10 +16,10 @@ export default function Home() {
         
         <div className="pt-8">
           <Link
-            href="/example"
+            href="/login"
             className="inline-flex items-center gap-2 px-6 py-3 border border-border bg-foreground text-background hover:bg-foreground/90 transition-colors text-sm font-medium tracking-wider uppercase"
           >
-            View Demo Dashboard
+            Login
             <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>

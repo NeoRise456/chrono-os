@@ -5,11 +5,11 @@ import {
   CheckSquare,
   Target,
   Repeat,
-  Settings,
   LogOut,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useQuery, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { authClient } from "@/lib/auth-client"
@@ -26,6 +26,13 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const navItems = [
   {
@@ -48,17 +55,18 @@ const navItems = [
     href: "/goals",
     icon: Target,
   },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
 ]
 
 export function ChronoSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { isAuthenticated } = useConvexAuth()
   const user = useQuery(api.auth.getCurrentUser, isAuthenticated ? {} : "skip")
+
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    router.push("/login")
+  }
 
 return (
     <Sidebar collapsible="offcanvas" className="border-r border-border">
@@ -104,10 +112,10 @@ return (
       </SidebarContent>
       
       <SidebarFooter className="p-6">
-        <div className="space-y-4">
-          {user ? (
-            <>
-              <div className="flex items-center gap-3 border-t border-border pt-4">
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-3 w-full border-t border-border pt-4 text-left hover:bg-accent/50 transition-colors group">
                 {user.image && (
                   <img
                     src={user.image}
@@ -125,21 +133,29 @@ return (
                     </p>
                   )}
                 </div>
-              </div>
-              <button
-                onClick={() => authClient.signOut()}
-                className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors font-display w-full"
-              >
-                <LogOut className="size-[18px]" aria-hidden="true" />
-                <span>SIGN_OUT</span>
+                <ChevronDown className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               </button>
-            </>
-          ) : (
-            <div className="text-xs text-muted-foreground font-display">
-              LOADING_USER...
-            </div>
-          )}
-        </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="top"
+              align="end"
+              className="min-w-[200px] border-2 bg-background font-display"
+            >
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                variant="destructive"
+                className="cursor-pointer font-display tracking-wider text-sm"
+              >
+                <LogOut className="size-4" />
+                <span>SIGN_OUT</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="text-xs text-muted-foreground font-display">
+            LOADING_USER...
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

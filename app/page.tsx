@@ -32,7 +32,7 @@ export default function Home() {
         </div>
         
         <p className="text-xs text-muted-foreground pt-8">
-          Next.js + Convex + Tailwind CSS + TypeScript n a bunch of stuff
+          Next.js + Convex n a bunch of stuff
         </p>
       </div>
     </main>

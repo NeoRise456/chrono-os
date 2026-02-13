@@ -7,7 +7,7 @@ export default function Home() {
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-4 h-4 bg-foreground" aria-hidden="true" />
-            <h1 className="text-3xl font-bold tracking-widest">NEO LIFE PLANNER</h1>
+            <h1 className="text-3xl font-bold tracking-widest">CHRONO_OS</h1>
           </div>
           <p className="text-muted-foreground text-sm uppercase tracking-wider">
             Track and optimize your daily habits with precision
@@ -18,6 +18,7 @@ export default function Home() {
             &gt; github repo &lt; 
             </Link> 
           </span>
+          
         </div>
         
         <div className="pt-8">
@@ -31,7 +32,7 @@ export default function Home() {
         </div>
         
         <p className="text-xs text-muted-foreground pt-8">
-          Next.js + Convex + Tailwind CSS + TypeScript
+          Next.js + Convex + Tailwind CSS + TypeScript n a bunch of stuff
         </p>
       </div>
     </main>

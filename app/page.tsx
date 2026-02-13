@@ -12,6 +12,12 @@ export default function Home() {
           <p className="text-muted-foreground text-sm uppercase tracking-wider">
             Track and optimize your daily habits with precision
           </p>
+          <span className="text-xs text-muted-foreground"> 
+             
+            <Link href="https://github.com/NeoRise456/chrono-os" className="text-muted-foreground hover:text-foreground hover:underline transition-colors">
+            &gt; github repo &lt; 
+            </Link> 
+          </span>
         </div>
         
         <div className="pt-8">

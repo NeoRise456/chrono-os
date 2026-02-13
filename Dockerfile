@@ -30,7 +30,7 @@ COPY . .
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm exec convex typegen && pnpm run build; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm exec convex codegen && pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
   fi
 

@@ -14,6 +14,7 @@ export function ConvexClientProvider({
   children: ReactNode;
   initialToken?: string | null;
 }) {
+  console.log("[DEBUG] Client initialToken:", initialToken ? `exists (${initialToken.substring(0, 20)}...)` : "NULL/undefined");
   return (
     <ConvexBetterAuthProvider
       client={convex}

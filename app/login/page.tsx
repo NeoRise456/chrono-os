@@ -3,15 +3,12 @@
 import Link from "next/link"
 import { Github, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 
-
-
 function SyncTime() {
   const [time, setTime] = useState<string | null>(null);
-
 
   useEffect(() => {
     const updateTime = () => {
@@ -40,8 +37,8 @@ function SyncTime() {
   )
 }
 
-export default function LoginPage() {
-
+// 1. Move the actual login UI and hooks into this sub-component
+function LoginContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/habits";
 
@@ -50,8 +47,6 @@ export default function LoginPage() {
       provider: "github",
       callbackURL: callbackUrl
     });
-
-
   }
 
   return (
@@ -89,16 +84,23 @@ export default function LoginPage() {
                 <Github className="mr-2 h-4 w-4" />
                 Github
             </Button>
-
-            
           </div>
         </div>
       </main>
 
       <footer className="p-6 border-t border-zinc-200 dark:border-zinc-900 flex flex-col md:flex-row justify-between md:justify-end items-center gap-4 text-right text-[10px]">
-        
         <span>Made with &lt;3 By <Link href="https://juanastonitas.is-a.dev/" className="text-zinc-500 hover:text-zinc-300">NeoRise</Link></span>
       </footer>
     </div>
+  )
+}
+
+// 2. Wrap the sub-component in a Suspense boundary for the default export
+export default function LoginPage() {
+  return (
+    // You can customize this fallback to be a spinner or a blank page
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

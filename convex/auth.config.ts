@@ -1,15 +1,5 @@
-import type { AuthConfig } from "convex/server";
-
-const siteUrl = process.env.SITE_URL!;
+import { getAuthConfigProvider } from "@convex-dev/better-auth/auth-config";
 
 export default {
-  providers: [
-    {
-      type: "customJwt",
-      issuer: siteUrl,
-      applicationID: "convex",
-      jwks: `${siteUrl}/api/auth/jwks`,
-      algorithm: "RS256",
-    },
-  ],
-} satisfies AuthConfig;
+  providers: [getAuthConfigProvider()],
+};

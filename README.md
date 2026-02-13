@@ -1,49 +1,119 @@
-# Neo Life Planner
+# CHRONO_OS
 
-This project is a [Next.js](https://nextjs.org) application with [Convex](https://convex.dev) as the backend.
+A personal productivity app for habit tracking, task management, and weekly scheduling.
 
-## Prerequisites
+## Why I Built This
+
+I wasn't satisfied with existing habit trackers—their implementations didn't match how I think about productivity. So I built my own.
+
+This started as a side project while I was working on something else. In just two weeks, I had a functional site. I'm actively using it to manage my life now.
+
+I also used this project to practice articulating my ideas to AI. With the help of Vibe Kanban and OpenCode, nearly all of the UI was AI-generated—letting me focus on shaping the product rather than writing boilerplate.
+
+## Features
+
+### Habit Tracking
+- Create, edit, archive, and delete habits
+- Custom colors, icons, and default durations
+- Daily completion logging with counter support
+- Reorder habits via drag-and-drop
+
+### Statistics & Analytics
+- **Streaks** — Current and best streaks with a weekly "shield" mechanic: miss one day per week without breaking your streak
+- **Consistency Rate** — Track completion percentage over time
+- **Daily Volume** — See how many habits you completed each day
+- **Focus Trend** — Weekly progress visualization
+- **Density Map** — GitHub-style activity heatmap
+
+### Task Management
+- **Inbox** — One-off tasks with due dates, tags, and priorities
+- **Routines** — Recurring tasks (daily/weekly/monthly) that auto-reset
+
+### Weekly Schedule
+- Drag-and-drop habit scheduling on a weekly timetable
+- Visual time blocks for planned activities
+- Duplicate schedule cards across days
+
+### Authentication
+- GitHub OAuth via Better Auth
+
+## Tech Stack
+
+| Technology | Why |
+|------------|-----|
+| **Next.js 16** | App Router with SSR, excellent DX for full-stack React |
+| **Convex** | Real-time reactive backend with zero infrastructure management |
+| **Better Auth** | Simple, type-safe authentication with GitHub OAuth |
+| **React 19 + TypeScript** | Latest React features with full type safety |
+| **Tailwind CSS 4 + Radix UI** | Utility-first styling with accessible primitives |
+| **Recharts** | Composable charts for habit statistics |
+| **Vibe Kanban + OpenCode** | AI-assisted development (Opus 4.5, GLM-5, GLM-4.7) — generated nearly all UI code |
+
+## Architecture
+
+```
+neo-life-planner/
+├── app/                      # Next.js App Router
+│   ├── (protected)/          # Auth-required routes
+│   │   ├── habits/           # Habit tracking
+│   │   ├── schedule/         # Weekly timetable
+│   │   ├── todos/            # Task management
+│   │   └── profile/          # User profile
+│   ├── login/                # Authentication
+│   └── api/auth/             # Better Auth routes
+├── components/
+│   ├── ui/                   # Radix-based UI primitives
+│   ├── habits/               # Habit feature components
+│   ├── chrono/               # Schedule feature components
+│   └── todo/                 # Task feature components
+├── convex/                   # Convex backend
+│   ├── schema.ts             # Database schema
+│   ├── habits.ts             # Habit CRUD
+│   ├── habitLogs.ts          # Habit logging
+│   ├── habitStats.ts         # Statistics queries
+│   ├── tasks.ts              # Task CRUD
+│   └── scheduleCards.ts      # Schedule CRUD
+└── lib/                      # Utilities & auth config
+```
+
+**Data Flow:**
+
+```
+React Component → Convex Query/Mutation → Real-time Sync → UI Update
+```
+
+## Getting Started
+
+### Prerequisites
 
 - Node.js
 - pnpm
 
-## Getting Started
+### Installation
 
-1.  **Install dependencies:**
+1. Install dependencies:
 
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 
-2.  **Initialize Convex:**
+2. Initialize Convex (prompts login and creates project):
 
-    This will prompt you to log in to Convex and create a new project. It will also generate the necessary code in `convex/_generated`.
+   ```bash
+   npx convex dev
+   ```
 
-    ```bash
-    npx convex dev
-    ```
+   Keep this running in a separate terminal.
 
-    Keep this running in a separate terminal window while developing.
+3. Start the development server:
 
-3.  **Run the Next.js development server:**
+   ```bash
+   pnpm dev
+   ```
 
-    ```bash
-    pnpm dev
-    ```
-
-4.  **Open the app:**
-
-    Navigate to [http://localhost:3000](http://localhost:3000).
-
-## Project Structure
-
-- `app/`: Next.js App Router pages and components.
-- `convex/`: Convex backend functions (queries, mutations, actions).
-- `convex/_generated/`: Auto-generated Convex code (do not edit).
+4. Open http://localhost:3000
 
 ## Deployment
-
-To deploy to production:
 
 ```bash
 pnpm build

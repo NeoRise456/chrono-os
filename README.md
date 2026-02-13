@@ -4,11 +4,15 @@ A personal productivity app for habit tracking, task management, and weekly sche
 
 ## Why I Built This
 
-I wasn't satisfied with existing habit trackers—their implementations didn't match how I think about productivity. So I built my own.
+I wasn't satisfied with existing habit trackers, their implementations were paid so I built my own lmao.
 
 This started as a side project while I was working on something else. In just two weeks, I had a functional site. I'm actively using it to manage my life now.
 
-I also used this project to practice articulating my ideas to AI. With the help of Vibe Kanban and OpenCode, nearly all of the UI was AI-generated—letting me focus on shaping the product rather than writing boilerplate.
+I also used this project to practice articulating my ideas to AI. With the help of Vibe Kanban and OpenCode, nearly all of the UI was AI generated letting me focus on shaping the product rather than writing boilerplate.
+
+
+> *the era of personal softwre some people say*
+> * neo (like im sayin it uk [pls shut up] )
 
 ## Features
 
@@ -52,7 +56,7 @@ I also used this project to practice articulating my ideas to AI. With the help 
 ## Architecture
 
 ```
-neo-life-planner/
+chrono-os/
 ├── app/                      # Next.js App Router
 │   ├── (protected)/          # Auth-required routes
 │   │   ├── habits/           # Habit tracking

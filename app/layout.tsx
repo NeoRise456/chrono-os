@@ -32,7 +32,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const token = await getToken();
-  console.log("[DEBUG] Server token:", token ? `exists (${token.substring(0, 20)}...)` : "NULL");
   return (
     <html lang="en" suppressHydrationWarning>
       <body

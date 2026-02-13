@@ -55,8 +55,7 @@ const navItems = [
 export function ChronoSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useConvexAuth()
-  console.log("[DEBUG] Convex auth state:", { isAuthenticated, isLoading })
+  const { isAuthenticated } = useConvexAuth()
   const user = useQuery(api.auth.getCurrentUser, isAuthenticated ? {} : "skip")
 
   const handleSignOut = async () => {

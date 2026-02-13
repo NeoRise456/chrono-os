@@ -49,12 +49,7 @@ const navItems = [
     title: "Todos",
     href: "/todos",
     icon: CheckSquare,
-  },
-  {
-    title: "Goals",
-    href: "/goals",
-    icon: Target,
-  },
+  }
 ]
 
 export function ChronoSidebar() {

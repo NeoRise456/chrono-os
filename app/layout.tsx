@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import { getToken } from "@/lib/auth-server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,11 +26,12 @@ export const metadata: Metadata = {
   description: "Track and optimize your daily habits with precision",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = await getToken();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -41,9 +43,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ConvexClientProvider  >
+          <ConvexClientProvider initialToken={token}>
             {children}
-            </ConvexClientProvider>
+          </ConvexClientProvider>
         </ThemeProvider>
       </body>
     </html>

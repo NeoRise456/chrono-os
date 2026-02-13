@@ -181,3 +181,110 @@ React Component → Convex Query/Mutation → Real-time Sync → UI Update
 
 5. Open http://localhost:3000
 
+## Production Deployment
+
+This app is deployed on a **Hostinger VPS** using **[Dokploy](https://dokploy.com/)**. Convex is self-hosted rather than using the cloud offering.
+
+### Architecture
+
+```
+neorise.cloud
+├── chrono-os.neorise.cloud           → Next.js app (port 3000)
+├── convex-backend-main.neorise.cloud → Convex Cloud API (port 3210)
+└── convex-backend-alt.neorise.cloud  → Convex Site/HTTP Actions (port 3211)
+```
+
+### Self-Hosted Convex Backend
+
+#### 1. Create Compose Project in Dokploy
+
+Create a new **Compose** project and paste the contents of `selfhostconvex-docker-compose.yaml`.
+
+#### 2. Configure Environment Variables
+
+Go to the **Environment** tab and add:
+
+**Required:**
+```
+INSTANCE_SECRET=<generate with: openssl rand -hex 32>
+```
+
+**URLs — Option A: Dokploy's Free Traefik Domains (Quick Start)**
+```
+CONVEX_CLOUD_ORIGIN=http://shhosted-convex-cf33fb-<your-ip>.traefik.me
+CONVEX_SITE_ORIGIN=http://shhosted-convex-59a34c-<your-ip>.traefik.me
+NEXT_PUBLIC_DEPLOYMENT_URL=http://shhosted-convex-cf33fb-<your-ip>.traefik.me
+```
+
+**URLs — Option B: Custom Domain (Production)**
+```
+CONVEX_CLOUD_ORIGIN=https://convex-backend-main.neorise.cloud
+CONVEX_SITE_ORIGIN=https://convex-backend-alt.neorise.cloud
+NEXT_PUBLIC_DEPLOYMENT_URL=https://convex-backend-main.neorise.cloud
+```
+
+**PostgreSQL (leave empty for SQLite):**
+```
+DB_PASSWORD=your-strong-password
+POSTGRES_URL=postgresql://postgres:your-strong-password@postgres:5432
+```
+
+#### 3. Configure Domains in Dokploy
+
+Go to the **Domains** tab and add:
+- `convex-backend-main.neorise.cloud` → Port `3210`
+- `convex-backend-alt.neorise.cloud` → Port `3211`
+
+Dokploy's Traefik will automatically provision SSL certificates.
+
+#### 4. Deploy and Generate Admin Key
+
+1. Click **Deploy** and wait for services to start
+2. Once healthy, click **Terminal** on the backend container
+3. Run:
+   ```bash
+   cd convex
+   ./generate_admin_key.sh
+   ```
+4. Save the admin key securely — you'll need it for the Next.js app
+
+#### 5. Set Convex Environment Variables
+
+Using the Convex CLI (or Dashboard), set these in your deployment:
+
+```bash
+npx convex env set BETTER_AUTH_SECRET <generate with: openssl rand -base64 32>
+npx convex env set SITE_URL https://chrono-os.neorise.cloud
+npx convex env set GITHUB_CLIENT_ID <your-github-oauth-client-id>
+npx convex env set GITHUB_CLIENT_SECRET <your-github-oauth-client-secret>
+```
+
+### Next.js App
+
+#### 1. Create Application in Dokploy
+
+Create a new **Application** → **Deploy from Git** or use the repository.
+
+#### 2. Configure Build
+
+Dokploy will automatically detect and use the `Dockerfile`.
+
+#### 3. Configure Environment Variables
+
+```
+CONVEX_SELF_HOSTED_URL=https://convex-backend-main.neorise.cloud
+CONVEX_SELF_HOSTED_ADMIN_KEY=<admin-key-from-step-4>
+NEXT_PUBLIC_CONVEX_URL=https://convex-backend-main.neorise.cloud
+NEXT_PUBLIC_CONVEX_SITE_URL=https://convex-backend-alt.neorise.cloud
+NEXT_PUBLIC_SITE_URL=https://chrono-os.neorise.cloud
+```
+
+#### 4. Configure Domain
+
+Add domain: `chrono-os.neorise.cloud`
+
+#### 5. Deploy
+
+Click **Deploy** — Dokploy will build and run the container.
+
+

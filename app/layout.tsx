@@ -24,6 +24,10 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "CHRONO_OS",
   description: "Track and optimize your daily habits with precision",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://chrono-os.neorise.cloud"),
+  openGraph: {
+    images: "/metadata-pic.png"
+  }
 };
 
 export default async function RootLayout({

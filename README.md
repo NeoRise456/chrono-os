@@ -2,6 +2,8 @@
 
 A personal productivity app for habit tracking, task management, and weekly scheduling.
 
+check it out at [https://chrono-os.neorise.cloud/](https://chrono-os.neorise.cloud/)
+
 ## Why I Built This
 
 I wasn't satisfied with existing habit trackers, their implementations were paid so I built my own lmao.

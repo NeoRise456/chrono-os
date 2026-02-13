@@ -2,7 +2,7 @@
 
 A personal productivity app for habit tracking, task management, and weekly scheduling.
 
-check it out at [https://chrono-os.neorise.cloud/](https://chrono-os.neorise.cloud/)
+check it out at: [https://chrono-os.neorise.cloud/](https://chrono-os.neorise.cloud/)
 
 ## Why I Built This
 

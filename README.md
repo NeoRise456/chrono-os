@@ -92,8 +92,72 @@ React Component → Convex Query/Mutation → Real-time Sync → UI Update
 
 - Node.js
 - pnpm
+- docker
 
 ### Installation
+
+#### Installation of the convex databse
+
+1.  Start the Infrastructure
+    Spin up the Backend, Dashboard, and PostgreSQL database using the included compose file:
+
+    ```bash
+    docker compose -f selfhostconvex-docker-compose.yaml up -d
+    ```
+
+2.  Generate Admin Key
+    You must generate an admin key to authenticate the CLI with your self-hosted instance. Run the generation script inside the backend container:
+
+    ```bash
+    docker compose -f selfhostconvex-docker-compose.yaml exec backend ./generate_admin_key.sh
+    ```
+    *> Copy the key output by this command (e.g., `sk_...`).*
+
+3.  Configure Project Environment
+    Update your `.env.local` file to point your app and the Convex CLI to your local instance instead of the cloud:
+
+    ```bash
+    
+    
+    # Connection to the self-hosted backend
+    CONVEX_SELF_HOSTED_URL=http://127.0.0.1:3210
+    
+    # The key you generated in Step 2
+    CONVEX_SELF_HOSTED_ADMIN_KEY=sk_your_generated_key_here
+    
+    # Public URL for your frontend to connect
+    NEXT_PUBLIC_CONVEX_URL=http://127.0.0.1:3210
+
+    # Public URL for your frontend to connect
+    NEXT_PUBLIC_CONVEX_SITE_URL=http://127.0.0.1:3211
+
+    # Public URL for your frontend to 
+    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+    
+    ```
+4. Initialize Convex in project:
+
+   ```bash
+   npx convex dev
+   ```
+   
+5.  Configure Convex Environment
+    You must run the following commands to setup your convex database (setting up better auth plugin)
+
+    Refer to the convex + better auth docs: [https://labs.convex.dev/better-auth/framework-guides/next](https://labs.convex.dev/better-auth/framework-guides/next)
+
+    ```bash
+    npx convex env set BETTER_AUTH_SECRET=$(openssl rand -base64 32)
+    npx convex env set SITE_URL http://localhost:3000
+    ```
+
+##### Accessing Services
+
+-   **Dashboard**: Visit http://localhost:6791 to manage your data and functions.
+-   **Backend API**: Listening at http://127.0.0.1:3210.
+-   **Database**: PostgreSQL is available on port `5432` .
+
+#### Installation of the nextjs project
 
 1. Install dependencies:
 
@@ -107,19 +171,11 @@ React Component → Convex Query/Mutation → Real-time Sync → UI Update
    npx convex dev
    ```
 
-   Keep this running in a separate terminal.
-
 3. Start the development server:
 
    ```bash
    pnpm dev
    ```
 
-4. Open http://localhost:3000
+5. Open http://localhost:3000
 
-## Deployment
-
-```bash
-pnpm build
-npx convex deploy
-```

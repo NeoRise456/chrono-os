@@ -33,7 +33,7 @@ export function ChronoDashboard() {
           <main className="flex-1 overflow-hidden relative">
             {/* Timetable - full width, adjusts to sheet height */}
             <div 
-              className="absolute inset-0 p-0.5 overflow-hidden transition-[bottom] duration-200 ease-out"
+              className="absolute inset-0  overflow-hidden transition-[bottom] duration-200 ease-out"
               style={{ bottom: `${sheetHeight}px` }}
             >
               <div className="h-full border border-border">

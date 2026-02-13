@@ -147,15 +147,16 @@ export function EditHabitSheet() {
   return (
     <>
       <Sheet open={isEditSheetOpen} onOpenChange={closeEditSheet}>
-        <SheetContent className="w-[480px]">
+        <SheetContent className="w-[580px] p-4">
           <SheetHeader>
             <SheetTitle className="text-2xl font-display font-bold">
               EDIT HABIT
             </SheetTitle>
           </SheetHeader>
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-6">
-            <div className="space-y-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto space-y-4 py-4">
+              <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
               <Input
                 id="name"
@@ -181,7 +182,7 @@ export function EditHabitSheet() {
 
             <div className="space-y-2">
               <Label>Color</Label>
-              <div className="flex gap-1.5">
+              <div className="flex gap-0.5">
                 {CARD_COLORS.map((color) => (
                   <button
                     key={color.value}
@@ -257,8 +258,9 @@ export function EditHabitSheet() {
                 Track completions
               </Label>
             </div>
+            </div>
 
-            <SheetFooter className="pt-4 flex-col gap-2">
+            <SheetFooter className="pt-4 flex-col gap-2 flex-shrink-0">
               <div className="flex gap-2 w-full">
                 <Button type="button" variant="outline" onClick={closeEditSheet} className="font-display flex-1">
                   Cancel

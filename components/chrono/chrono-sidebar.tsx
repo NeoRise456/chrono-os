@@ -115,7 +115,7 @@ return (
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 w-full border-t border-border pt-4 text-left hover:bg-accent/50 transition-colors group">
+              <button className="flex items-center gap-3 w-full border-t border-border p-2 text-left hover:bg-accent/50 transition-colors group">
                 {user.image && (
                   <img
                     src={user.image}

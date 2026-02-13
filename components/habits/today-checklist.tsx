@@ -34,7 +34,7 @@ export function TodayChecklist() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mt-[1px] bg-card p-6 border border-border tech-border space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold font-display tracking-tight">

@@ -22,6 +22,8 @@ import { api } from "@/convex/_generated/api"
 function HabitsDashboardContent() {
   const { isToday } = useHabitsContext()
   const { isAuthenticated } = useConvexAuth()
+
+  //TODO change this to convex function/ database logic
   const createDefaultHabits = useMutation(api.habits.createDefaultHabits)
 
   useEffect(() => {
@@ -33,8 +35,8 @@ function HabitsDashboardContent() {
   return (
     <>
       <HabitsHeader />
-      <main className="flex-1 p-0.5 overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-[1px] bg-border border border-border">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-border border border-border">
           <ConsistencyRateCard />
           <CurrentStreakCard />
           <DailyVolumeCard />
@@ -42,7 +44,7 @@ function HabitsDashboardContent() {
           <FocusTrendCard />
         </div>
         <TodayChecklist />
-        <div className="mt-[1px]">
+        <div className="mt-px">
           <HabitDensityMap />
         </div>
       </main>
@@ -56,7 +58,7 @@ export function HabitTrackerDashboard() {
   return (
     <SidebarProvider defaultOpen={true}>
       <ChronoSidebar />
-      <SidebarInset className="min-h-screen bg-background">
+      <SidebarInset className="h-screen bg-background overflow-hidden">
         <HabitsProvider>
           <HabitsDashboardContent />
         </HabitsProvider>

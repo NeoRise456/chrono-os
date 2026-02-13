@@ -97,17 +97,19 @@ export function AddHabitSheet() {
     }
   }
 
+  //TODO: change design, i wanted to be finished with it so bad i just threw it together lmao
   return (
-    <Sheet open={isAddSheetOpen} onOpenChange={closeAddSheet}>
-      <SheetContent className="w-[480px]">
-        <SheetHeader>
-          <SheetTitle className="text-2xl font-display font-bold">
-            CREATE NEW HABIT
-          </SheetTitle>
-        </SheetHeader>
+      <Sheet open={isAddSheetOpen} onOpenChange={closeAddSheet}>
+        <SheetContent className="w-[480px] p-4">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-display font-bold">
+              CREATE NEW HABIT
+            </SheetTitle>
+          </SheetHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-6">
-          <div className="space-y-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto space-y-4 py-4">
+              <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
@@ -212,8 +214,9 @@ export function AddHabitSheet() {
               Track completions (uncheck for schedule-only items like Lunch)
             </Label>
           </div>
+          </div>
 
-          <SheetFooter className="pt-4">
+          <SheetFooter className="pt-4 flex-shrink-0">
             <Button type="button" variant="outline" onClick={closeAddSheet} className="font-display">
               Cancel
             </Button>
